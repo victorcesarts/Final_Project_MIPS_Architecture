@@ -139,13 +139,14 @@ entity DataPath is
 				
 
         begin
+            ALUOut <= internal_ALUResult;
             -- BEGIN OF ALU LOGIC --
             ALU_inst : ALU port map(
                 ALUControl => ALUControl, 
                 SrcA => internal_RD1,
                 SrcB => internal_OutputSrc,
                 ZEROFlag => Zero,
-                ALUResult => ALUOut
+                ALUResult => internal_ALUResult
             );
             MUX_ALU : MUX port map(
                 Control => ALUSrc,

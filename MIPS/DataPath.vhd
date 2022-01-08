@@ -6,6 +6,7 @@ entity DataPath is
     port(
         clk   : in std_logic;
         reset : in std_logic;
+       -- MemWrite : in std_logic;
         MemToReg : in std_logic;
         RegWrite : in std_logic;
         ALUSrc : in std_logic;
@@ -138,13 +139,14 @@ entity DataPath is
 				
 
         begin
+            ALUOut <= internal_ALUResult;
             -- BEGIN OF ALU LOGIC --
             ALU_inst : ALU port map(
                 ALUControl => ALUControl, 
                 SrcA => internal_RD1,
                 SrcB => internal_OutputSrc,
                 ZEROFlag => Zero,
-                ALUResult => ALUOut
+                ALUResult => internal_ALUResult
             );
             MUX_ALU : MUX port map(
                 Control => ALUSrc,
