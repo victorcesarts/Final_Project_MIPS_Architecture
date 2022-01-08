@@ -6,6 +6,7 @@ entity DataPath is
     port(
         clk   : in std_logic;
         reset : in std_logic;
+       -- MemWrite : in std_logic;
         MemToReg : in std_logic;
         RegWrite : in std_logic;
         ALUSrc : in std_logic;
