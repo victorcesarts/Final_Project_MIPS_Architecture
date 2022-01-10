@@ -16,7 +16,7 @@ entity maindecoder is
             MemWriteM  : out std_logic;
             BranchM    : out std_logic;
             AluSrcM    : out std_logic;
-            RegDstM    : out std_logic;
+            RegDstM    : out std_logic_vector(1 downto 0);
             RegWriteM  : out std_logic;
             jumpM      : out std_logic;
             ALUopM     : out std_logic_vector(1 downto 0)
@@ -30,7 +30,17 @@ architecture MainDECARCH of maindecoder is
         case to_integer(unsigned(OPM)) is
         when 0 => --R-Type
             RegWriteM <= '1';
-            RegDstM <= '1';
+            RegDstM <= "01";
+            AluSrcM <= '0';
+            BranchM <= '0'; 
+            MemWriteM <= '0'; 
+            MemToRegM <= '0';    
+            ALUopM <= "10"; --look at funct   
+            jumpM <= '0';
+
+        when 3 => --Jump and link
+            RegWriteM <= '1';
+            RegDstM <= "10"; --31
             AluSrcM <= '0';
             BranchM <= '0'; 
             MemWriteM <= '0'; 
@@ -40,7 +50,7 @@ architecture MainDECARCH of maindecoder is
 
             when 32 to 37 => --all load instructions
                 RegWriteM <= '1';
-                RegDstM <= '0';
+                RegDstM <= "00";
                 AluSrcM <= '1';
                 BranchM <= '0'; 
                 MemWriteM <= '0'; 
@@ -50,7 +60,7 @@ architecture MainDECARCH of maindecoder is
 
             when 40 to 43 => --all store instructions
                 RegWriteM <= '0';
-                RegDstM <= 'X';
+                RegDstM <= "XX";
                 AluSrcM <= '1';
                 BranchM <= '0'; 
                 MemWriteM <= '1'; 
@@ -60,7 +70,7 @@ architecture MainDECARCH of maindecoder is
             
             when 8 | 9 => --addi or addiu
                 RegWriteM <= '1';
-                RegDstM <= '0';
+                RegDstM <= "00";
                 AluSrcM <= '1';
                 BranchM <= '0'; 
                 MemWriteM <= '0'; 
@@ -70,7 +80,7 @@ architecture MainDECARCH of maindecoder is
 
             when 2 => --JUMP
                 RegWriteM <= '0';
-                RegDstM <= 'X';
+                RegDstM <= "XX";
                 AluSrcM <= 'X';
                 BranchM <= 'X'; 
                 MemWriteM <= '0'; 
@@ -83,7 +93,7 @@ architecture MainDECARCH of maindecoder is
                 MemWriteM <= 'X';
                 BranchM <= 'X';
                 AluSrcM <= 'X';
-                RegDstM <= 'X';
+                RegDstM <= "XX";
                 RegWriteM <= 'X';
                 jumpM <= 'X';
                 ALUopM <= "XX";

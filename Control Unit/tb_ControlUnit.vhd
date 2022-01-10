@@ -13,12 +13,13 @@ component ControlUnit is
     port(    
         OP          : in std_logic_vector (5 downto 0);
         Funct       : in std_logic_vector (5 downto 0);
+        Zero        : in std_logic;
         MemToReg    : out std_logic;
         MemWrite    : out std_logic;
-        Branch      : out std_logic;
+        PCsrc       : out std_logic;
         ALUControl  : out std_logic_vector(2 downto 0);
         AluSrc      : out std_logic;
-        RegDst      : out std_logic;
+        RegDst      : out std_logic_vector(1 downto 0);
         RegWrite    : out std_logic;
         Jump        : out std_logic
     );
@@ -30,27 +31,26 @@ end component;
     constant DUTY_CYCLE : real := 0.5;
     constant OFFSET     : time := 5 ns;
 
-    file	inputs_data_op	    : text open read_mode  is "inputop.txt";
-    file	inputs_data_Funct   : text open read_mode  is "inputFunct.txt";
+    file	inputs_data	    : text open read_mode  is "input.txt";
     file	data_compare        : text open read_mode  is "inputcompare.txt";
 	file	outputs_data	    : text open write_mode is "output.txt";
     file	outputs_data_comp   : text open write_mode is "outputdata_comp.txt";
 
     constant min_value	: natural := 1;
-    constant max_value  : natural := 14;
+    constant max_value  : natural := 35;
 
-    signal read_data_inOP	 : std_logic:='0';
-    signal read_data_inFunct : std_logic:='0';
+    signal read_data_in	 : std_logic:='0';
     signal flag_write	     : std_logic:='0';
 
     signal data_in_op   : std_logic_vector(5 downto 0);
     signal data_in_Funct: std_logic_vector(5 downto 0);
+    signal data_in_zero : std_logic;
     signal MemToRegOut  : std_logic;
     signal MemWriteOut  : std_logic;
-    signal BranchOut    : std_logic;
     signal ALUControlOut: std_logic_vector(2 downto 0);
     signal AluSrcOut    : std_logic;
-    signal RegDstOut    : std_logic;
+    signal PCSrcOut     : std_logic;
+    signal RegDstOut    : std_logic_vector(1 downto 0);
     signal RegWriteOut  : std_logic;
     signal JumpOut      : std_logic;
    
@@ -59,65 +59,58 @@ begin
     port map(
         OP         => data_in_op,
         Funct      => data_in_Funct, 
+        Zero       => data_in_zero,
         MemToReg   => MemToRegOut, 
         MemWrite   => MemWriteOut,
-        Branch     => BranchOut,
         ALUControl => ALUControlOut,
         AluSrc     => AluSrcOut,
+        PCSrc      => PCSrcOut,
         RegDst     => RegDstOut,
         RegWrite   => RegWriteOut,
         Jump       => JumpOut
     );
 
 ------------------------------------------------------------------------------------
------------------ processo para ler os dados do arquivo inputALUop.txt
+----------------- processo para ler os dados do arquivo input.txt
 ------------------------------------------------------------------------------------
-data_op:process
+data:process
 variable linea : line;
 variable inputOP : std_logic_vector(5 downto 0);
+variable inputFunct : std_logic_vector(5 downto 0);
+variable inputZero : std_logic;
 begin
-while not endfile(inputs_data_op) loop
-    if read_data_inOP = '1' then
-        readline(inputs_data_op,linea);
+while not endfile(inputs_data) loop
+    if read_data_in = '1' then
+        readline(inputs_data,linea);
         read(linea,inputOP);
         data_in_op <= inputOP;
+
+        readline(inputs_data,linea);
+        read(linea,inputFunct);
+        data_in_Funct <= inputFunct;
+
+        readline(inputs_data,linea);
+        read(linea,inputZero);
+        data_in_zero <= inputZero;
     end if;
     wait for PERIOD;
 end loop;
 wait;
-end process data_op;
+end process data;
 
 ------------------------------------------------------------------------------------
 ----------------- processo para gerar os estimulos de entrada do OP
 ------------------------------------------------------------------------------------
-tb_stimulus_OP : PROCESS
+tb_stimulus : PROCESS
 begin
 wait for (OFFSET + 0.5*PERIOD);
-    read_data_inOP <= '1';		
+    read_data_in <= '1';		
     for i in min_value to max_value loop --para leitura do n° de valores de entrada
         wait for PERIOD;
     end loop;
-    read_data_inOP <= '0';		
+    read_data_in <= '0';		
 wait; --suspend process
-end process tb_stimulus_OP;	
-
-------------------------------------------------------------------------------------
------------------ processo para ler os dados do arquivo inputFunct.txt
-------------------------------------------------------------------------------------
-data_Funct:process
-variable linea : line;
-variable inputFunct : std_logic_vector(5 downto 0);
-begin
-while not endfile(inputs_data_Funct) loop
-    if read_data_inOP = '1' then
-        readline(inputs_data_Funct,linea);
-        read(linea,inputFunct);
-        data_in_Funct <= inputFunct;
-    end if;
-    wait for PERIOD;
-end loop;
-wait;
-end process data_Funct;
+end process tb_stimulus;	
 
 ------------------------------------------------------------------------------------
 ------ processo para gerar os estimulos de escrita do arquivo de saida
@@ -141,9 +134,9 @@ variable lineSTR          : line;
 variable comp_out         : std_logic;
 variable comp_outALU      : std_logic_vector(2 downto 0);
 variable RegWriteoutput   : std_logic;
-variable RegDstoutput     : std_logic;
+variable RegDstoutput     : std_logic_vector(1 downto 0);
 variable AluSrcoutput     : std_logic;
-variable Branchoutput     : std_logic;
+variable PCSrcoutput     : std_logic;
 variable MemWriteoutput   : std_logic;
 variable MemToRegoutput   : std_logic;
 variable Jumpoutput       : std_logic;
@@ -176,17 +169,17 @@ begin
             write(linea,RegDstoutput);
             writeline(outputs_data, linea);
             --To read in order to compare--
-            readline(data_compare, linea);
-			read(linea, comp_out);
-            assert comp_out = RegDstoutput  report "ERROR" severity warning;
+           -- readline(data_compare, linea);
+			--read(linea, comp_out);
+            --assert comp_out = RegDstoutput  report "ERROR" severity warning;
             --Writing if the output it's good or not--
-            if (comp_out /= RegDstoutput) then
-                write(lineSTR, string'("Error"));
-                writeline(outputs_data_comp, lineSTR);
-            else
-                write(lineSTR, string'("Good"));
-                writeline(outputs_data_comp, lineSTR);
-            end if;
+            --if (comp_out /= RegDstoutput) then
+               -- write(lineSTR, string'("Error"));
+               -- writeline(outputs_data_comp, lineSTR);
+            --else
+              --  write(lineSTR, string'("Good"));
+              --  writeline(outputs_data_comp, lineSTR);
+           -- end if;
 
             AluSrcoutput    := AluSrcOut;
             write(lineSTR, string'("AluSrc"));
@@ -206,24 +199,24 @@ begin
                 writeline(outputs_data_comp, lineSTR);
             end if;
 
-            Branchoutput    := BranchOut;
-            write(lineSTR, string'("BranchOut"));
+            PCSrcoutput  := PCSrcout;
+            write(lineSTR, string'("RegWrite"));
             writeline(outputs_data, lineSTR);
-            write(linea,Branchoutput);
+            write(linea,PCSrcoutput);
             writeline(outputs_data, linea);
             --To read in order to compare--
             readline(data_compare, linea);
 			read(linea, comp_out);
-            assert comp_out = Branchoutput  report "ERROR" severity warning;
+            assert comp_out = PCSrcoutput  report "ERROR" severity warning;
             --Writing if the output it's good or not--
-            if (comp_out /= Branchoutput) then
+            if (comp_out /= PCSrcoutput) then
                 write(lineSTR, string'("Error"));
                 writeline(outputs_data_comp, lineSTR);
             else
                 write(lineSTR, string'("Good"));
                 writeline(outputs_data_comp, lineSTR);
             end if;
-
+        
             MemWriteoutput  := MemWriteOut;
             write(lineSTR, string'("MemWrite"));
             writeline(outputs_data, lineSTR);

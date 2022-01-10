@@ -13,7 +13,6 @@ component PC is
     port(
         pcin         : in std_logic_vector(31 downto 0);
         clk, reset   : in std_logic;
-        overflowFlag : out std_logic;
         pcout        : out std_logic_vector(31 downto 0)
     );
 end component;
@@ -29,7 +28,7 @@ end component;
     file	outputs_data_comp : text open write_mode is "outputdata_comp.txt";
 
     constant min_value  : natural := 1;
-    constant max_value  : natural := 329860;
+    constant max_value  : natural := 82465;
 
     signal read_data_inPC : std_logic:='0';
     signal flag_write	  : std_logic:='0';
@@ -37,7 +36,6 @@ end component;
     signal data_in_PCin  : std_logic_vector(31 downto 0);
     signal in_clk        : std_logic := '0';
     signal in_reset      : std_logic := '0';
-    signal overflowFLG   : std_logic;
     signal pcoutput      : std_logic_vector(31 downto 0);
    
 begin

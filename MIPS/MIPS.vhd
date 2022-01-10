@@ -23,7 +23,7 @@ architecture ARCH of MIPS is
         RegWrite : in std_logic;
         ALUSrc : in std_logic;
         ALUControl : in std_logic_vector(2 downto 0);
-        RegDST : in std_logic;
+        RegDST : in std_logic_vector(1 downto 0);
         Jump : in std_logic;
         Instr : in std_logic_vector(31 downto 0);
         Pcsrc : in std_logic;
@@ -45,25 +45,22 @@ architecture ARCH of MIPS is
         PCsrc       : out std_logic;
         ALUControl  : out std_logic_vector(2 downto 0);
         AluSrc      : out std_logic;
-        RegDst      : out std_logic;
+        RegDst      : out std_logic_vector(1 downto 0);
         RegWrite    : out std_logic;
         Jump        : out std_logic
     );
 	 end component;
 
-    signal internal_Instr : std_logic_vector(31 downto 0);
+   
     signal internal_PCsrc : std_logic;
-    signal internal_ReadData : std_logic_vector(31 downto 0);
-    signal internal_WriteData : std_logic_vector(31 downto 0);
-    signal internal_pc : std_logic_vector(31 downto 0);
     signal internal_exception : std_logic;
     signal internal_MemToReg : std_logic;
     signal internal_RegWrite : std_logic;
     signal internal_ALUSrc : std_logic;
     signal internal_ALUControl : std_logic_vector(2 downto 0);
-    signal internal_RegDST : std_logic;
+    signal internal_RegDST : std_logic_vector(1 downto 0);
     signal internal_jump : std_logic;
-    signal internal_MemWrite : std_logic;
+    
 	 signal internal_Zero : std_logic;
 
     begin

@@ -11,7 +11,7 @@ entity DataPath is
         RegWrite : in std_logic;
         ALUSrc : in std_logic;
         ALUControl : in std_logic_vector(2 downto 0);
-        RegDST : in std_logic;
+        RegDST : in std_logic_vector(1 downto 0);
         Jump : in std_logic;
         Instr : in std_logic_vector(31 downto 0);
         Pcsrc : in std_logic;
@@ -97,11 +97,13 @@ entity DataPath is
 
         component MUX5
             port (
-                Control_5 	: in    std_logic;
+                Control_5 	: in    std_logic_vector(1 downto 0);
                 InA_5   	: in    std_logic_vector(4 downto 0);
                 InB_5   	: in    std_logic_vector(4 downto 0);
+                In31        : in    std_logic_vector(4 downto 0);
                 OutputS_5 	: out   std_logic_vector(4 downto 0)
             );
+            
         end component;
 
             -- Internal signals ALU --
@@ -173,6 +175,7 @@ entity DataPath is
                 Control_5 => RegDST,
                 InA_5 => Instr(20 downto 16),
                 InB_5 => Instr(15 downto 11),
+                In31 => "11111",
                 OutputS_5  => WriteReg
             );
             MUX_DataMemory : MUX port map(
