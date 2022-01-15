@@ -34,7 +34,7 @@ end component;
     file	outputs_data_comp : text open write_mode is "outputdata_comp.txt";
 
     constant min_value  : natural := 1;
-    constant max_value  : natural := 2895622;
+    constant max_value  : natural := 13;
     --2895622
 
     signal read_data_inREG : std_logic:='0';
@@ -63,7 +63,7 @@ begin
         clk => data_CLK
     );
 
-    data_CLK <= not data_CLK after PERIOD/2;
+    data_CLK <= not data_CLK after PERIOD/5;
 
 ------------------------------------------------------------------------------------
 ----------------- processo para ler os dados do arquivo input.txt

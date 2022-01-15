@@ -10,5 +10,5 @@ add wave sim:/tb_PC/*
 view wave
 view structure
 view signals
-run 1250000 ns
+run 330000 ns
 #quit -force

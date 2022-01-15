@@ -27,7 +27,7 @@ architecture REGFileARCH of RegisterFile is
             end if;
         end process;
 		  
-	    process (A1, A2, A3, WD3, WE3) begin
+	    process (all) begin
             if((to_integer(unsigned(A1))) = 0) then
 			    RD1 <= x"00000000";
             else

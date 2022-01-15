@@ -1,20 +1,23 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use ieee.std_logic_textio.all;
+use std.textio.all;
 
+entity tb_Union is
+end tb_Union;
 
+architecture test of tb_Union is
 
-entity tb_PC is
-end tb_PC;
-
-architecture test of tb_PC is
-
-component PC is 
-    port(
-        pcin         : in std_logic_vector(31 downto 0);
-        clk, reset   : in std_logic;
-        pcout        : out std_logic_vector(31 downto 0)
-    );
+component Union is 
+port(
+    address_u : in std_logic_vector(31 downto 0);
+    clk : in std_logic;
+    RegWrite : in std_logic;
+    ReadData : in std_logic_vector(31 downto 0);
+    RD1_u : out std_logic_vector(31 downto 0);
+    RD2_u : out std_logic_vector(31 downto 0)
+);
 end component;
 
     -- Clock period definitions
@@ -22,57 +25,65 @@ end component;
     constant DUTY_CYCLE : real := 0.5;
     constant OFFSET     : time := 5 ns;
 
-    file	inputs_data_PC    : text open read_mode  is "inputPC.txt";
-    file	data_compare      : text open read_mode  is "inputcompare.txt";
+    file	inputs_data_Union    : text open read_mode  is "inputUnion.txt";
+  -- file	data_compare      : text open read_mode  is "inputcompare.txt";
 	file	outputs_data	  : text open write_mode is "output.txt";
     file	outputs_data_comp : text open write_mode is "outputdata_comp.txt";
 
     constant min_value  : natural := 1;
-    constant max_value  : natural := 20000;
+    constant max_value  : natural := 14;
 
     signal read_data_inPC : std_logic:='0';
     signal flag_write	  : std_logic:='0';
 
-    signal data_in_PCin  : std_logic_vector(31 downto 0);
+    signal data_in_addres  : std_logic_vector(31 downto 0);
+    signal data_in_data  : std_logic_vector(31 downto 0);
+    signal data_in_RegWrite        : std_logic := '0';
     signal in_clk        : std_logic := '0';
-    signal in_reset      : std_logic := '0';
-    signal pcoutput      : std_logic_vector(31 downto 0);
+    signal RD1output      : std_logic_vector(31 downto 0);
+    signal RD2output      : std_logic_vector(31 downto 0);
    
 begin
-    DUT : PC 
+    DUT : Union 
     port map(
-        pcin   => data_in_PCin, 
-        clk    => in_clk, 
-        reset  => in_reset,
-        pcout => pcoutput
+        address_u => data_in_addres,
+        RegWrite => data_in_RegWrite,
+        ReadData => data_in_data,
+        clk => in_clk,
+        RD1_u => RD1output,
+        RD2_u => RD2output
     );
+
     in_clk <= not in_clk after PERIOD/2;
-clk : process
-begin
-    wait for 6000 ns;
-    in_reset <= '1';
-    wait for 500 ns;
-    in_reset <= '0';
-    wait;
- end process;
+
 
 ------------------------------------------------------------------------------------
 ----------------- processo para ler os dados do arquivo input.txt
 ------------------------------------------------------------------------------------
-data_PC : process
-variable linea     : line;
-variable inputPC : std_logic_vector(31 downto 0);
+data_U : process
+variable linea    : line;
+variable inputAddress : std_logic_vector(31 downto 0);
+variable inputData : std_logic_vector(31 downto 0);
+variable inputReg : std_logic;
 begin
-while not endfile(inputs_data_PC) loop
+while not endfile(inputs_data_Union) loop
     if read_data_inPC = '1' then
-        readline(inputs_data_PC,linea);
-        hread(linea,inputPC);
-        data_in_PCin <= inputPC;
+        readline(inputs_data_Union,linea);
+        hread(linea,inputAddress);
+        data_in_addres <= inputAddress;
+
+        readline(inputs_data_Union,linea);
+        hread(linea,inputData);
+        data_in_data <= inputData;
+
+        readline(inputs_data_Union,linea);
+        read(linea,inputReg);
+        data_in_RegWrite <= inputReg;
     end if;
     wait for PERIOD;
 end loop;
 wait;
-end process data_PC;
+end process data_U;
 
 ------------------------------------------------------------------------------------
 ----------------- processo para gerar os estimulos de entrada 
@@ -111,36 +122,43 @@ variable linea              : line;
 variable lineb              : line;
 variable lineSTR            : line;
 variable comp_outPC  : std_logic_vector(31 downto 0);
-variable PCotpt    : std_logic_vector(31 downto 0);
+variable RD1out    : std_logic_vector(31 downto 0);
+variable RD2out    : std_logic_vector(31 downto 0);
 
 begin
     while true loop
         if (flag_write ='1')then
 
-            PCotpt  := pcoutput;
+            RD1out  := RD1output;
            --write(lineSTR, string'("The output is"));
             --writeline(outputs_data, lineSTR);
-            write(linea,PCotpt);
+            write(linea,RD1out);
             writeline(outputs_data, linea);
 
             --To read in order to compare--
-            readline(data_compare, lineb);
-			read(lineb, comp_outPC);
-            assert comp_outPC = PCotpt  report "ERROR" severity warning;
+            --readline(data_compare, lineb);
+			--read(lineb, comp_outPC);
+            --assert comp_outPC = PCotpt  report "ERROR" severity warning;
 
             --Writing if the output it's good or not--
-            if (comp_outPC = PCotpt) then
+           -- if (comp_outPC = PCotpt) then
                -- write(lineSTR, string'("The output is"));
                -- writeline(outputs_data_comp, lineSTR);
-                write(lineSTR, string'("GOOD"));
-                writeline(outputs_data_comp, lineSTR);
-           else
+            --    write(lineSTR, string'("GOOD"));
+            --    writeline(outputs_data_comp, lineSTR);
+          -- else
                 --write(lineSTR, string'("You've got an"));
                 --writeline(outputs_data_comp, lineSTR);
-                write(lineSTR, string'("ERROR"));
-                writeline(outputs_data_comp, lineSTR);
+            --    write(lineSTR, string'("ERROR"));
+            --    writeline(outputs_data_comp, lineSTR);
 
-            end if;
+            RD2out  := RD2output;
+            --write(lineSTR, string'("The output is"));
+             --writeline(outputs_data, lineSTR);
+             write(linea,RD2out);
+             writeline(outputs_data, linea);
+
+           -- end if;
            -- write(lineSTR, string'("-------------------------"));
            -- writeline(outputs_data_comp, lineSTR);
 

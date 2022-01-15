@@ -16,7 +16,6 @@ end InstrMemory;
 --and $s5, $s3, $s6
 --or $s7, $s5, $s4
 
-
 architecture InstrARCH of InstrMemory is 
 signal rom_addr : std_logic_vector(7 downto 0);
 type rom is array (0 to 12) of std_logic_vector(31 downto 0);

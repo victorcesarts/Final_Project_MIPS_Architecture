@@ -1,25 +1,36 @@
-import random
-from random import randint
-for WD3 in range (0, 256,1):
-    WD3='{0:08x}'.format(WD3)
-    for A1 in range(0,32,1):
-        A1='{0:05b}'.format(A1)
-        for A2 in reversed(range(0,32,1)):
-            A2='{0:05b}'.format(A2)
-            for A3 in range(0, 32):
-                A3 = randint(0, 32) 
-                A3='{0:05b}'.format(A3)
-           
-                with open("inputs.txt", "a") as arquivo:
-                    arquivo.write(str(A1)+'\n')
-                    arquivo.write(str(A2)+'\n')
-                    arquivo.write(str(A3)+'\n')
-                    arquivo.write(str(WD3)+'\n')
-                    arquivo.write(str(0)+'\n')
-                    arquivo.write(str(A1)+'\n')
-                    arquivo.write(str(A2)+'\n')
-                    arquivo.write(str(A3)+'\n')
-                    arquivo.write(str(WD3)+'\n')
-                    arquivo.write(str(1)+'\n')
-print("done")
-       
+f = open("InstrandDataRF.txt", "r")
+count = 1
+for x in f:
+    with open("inputs.txt", "a") as arquivo:
+        Instr = str(x)
+        
+        OP = (Instr[0: 6])
+        OP = int(OP, base = 2)
+        A1 = Instr[6: 11]
+        A2 = Instr[11: 16]
+        arquivo.write(str(A1) + '\n')
+        arquivo.write(str(A2) + '\n')
+        print(OP)
+        print(Instr)
+        print(A1)
+        print(A2)
+        if(OP == 0):
+            A3 = Instr[16:21]
+            arquivo.write(str(A3) + '\n')
+            print(A3)
+        elif (OP == 8 or OP == 9 or (OP >= 32 and OP <= 37)):
+            A3 = Instr[16:21]
+            arquivo.write(str(A3) + '\n')
+            print(A3)
+        else:
+            A3 = "XX"
+            arquivo.write(str(A3) + '\n')
+            print(A3)
+        if(OP == 2 or (OP >= 40 and OP <= 43)):
+            WE3 = 0
+            arquivo.write(str(WE3) + '\n')
+        else:
+            WE3 = 1
+            arquivo.write(str(WE3) + '\n')
+        
+        
