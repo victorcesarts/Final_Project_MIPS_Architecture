@@ -8,10 +8,16 @@ entity InstrMemory is
         instr : out std_logic_vector(31 downto 0)
     );
 end InstrMemory;
+--addi $t2, $0, 0
+--addi $s3, $0, 0
+--addi $s4, $0, 0
+--addi $s5, $0, 0
+--addi $s7, $0, 0
+--addi $s6, $0, 0
 --addi $s6, $0, 100
 --sw $s6, 40($0)	#Will fail because the memory address is not allowed sw $s6, 0x10010000($0)
 --lw $t2, 40($0)	#lw $s2 0x10010000($0)
---dd $s3, $s6, $t2
+--add $s3, $s6, $t2
 --sub $s4, $s3, $t2
 --and $s5, $s3, $s6
 --or $s7, $s5, $s4
@@ -37,5 +43,6 @@ rom :=rom'(
     "00000010101101001011100000100101");
 begin
     rom_addr <= address(9 downto 2);
-    instr <= Instr_data(to_integer(unsigned(rom_addr))) when ((address >= x"00400000") and (address <= x"0FFFFFFD")) else x"00000000";      
+    instr <= Instr_data(to_integer(unsigned(rom_addr))) when ((address >= x"00400000") and (address <= x"00400030")) else x"0000000C";    --syscall. The range can be change if there are more instr.
+                                                                                                                                          
 end InstrARCH; 
