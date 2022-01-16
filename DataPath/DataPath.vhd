@@ -3,6 +3,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
  entity DataPath is port(
+        Instr        : in std_logic_vector(31 downto 0);
         Reset        : in std_logic;
         clk          : in std_logic;
         ReadData     : in std_logic_vector(31 downto 0);
@@ -13,7 +14,8 @@ use ieee.numeric_std.all;
         PCSrc        : in std_logic;
         ALUControl_U : in std_logic_vector(2 downto 0);
         ZEROFlag_U   : out std_logic;
-        ALUOut     : out std_logic_vector(31 downto 0);
+        PCout        : out std_logic_vector(31 downto 0);
+        ALUOut       : out std_logic_vector(31 downto 0);
         WriteData    : out std_logic_vector(31 downto 0)
 );
 end DataPath;
@@ -22,11 +24,11 @@ architecture ARCH of DataPath is
 -------------------------------------------------------------
 --                   COMPONENTS BEGIN                     --
 -------------------------------------------------------------
-    component InstrMemory is port(
-        address : in std_logic_vector(31 downto 0);
-        instr   : out std_logic_vector(31 downto 0)
-    );
-    end component;
+    --component InstrMemory is port(
+      --  address : in std_logic_vector(31 downto 0);
+        --instr   : out std_logic_vector(31 downto 0)
+    --);
+    --end component;
 
     component RegisterFile is
         port(
@@ -133,6 +135,7 @@ architecture ARCH of DataPath is
 -------------------------------------------------------------
 --                   PC Logic                     --
 -------------------------------------------------------------
+        PCout <= internal_PCout;
         PC_inst : PC port map(
             pcin  => PC_in,
 			clk   => clk,
@@ -166,19 +169,19 @@ architecture ARCH of DataPath is
 -------------------------------------------------------------
 --                   Instruction Logic                     --
 -------------------------------------------------------------
-        Instr_inst : InstrMemory  port map(
-            address => internal_PCout,
-            instr   => internal_Instr
-        );
+     --   Instr_inst : InstrMemory  port map(
+      --      address => internal_PCout,
+        --    instr   => internal_Instr
+        --);
 
 -------------------------------------------------------------
 --                   Register File Logic                   --
 -------------------------------------------------------------
-       internal_Result <= ALUOut;
+       
        WriteData <= internal_RD2;
         Reg_inst : RegisterFile port map(
-            A1  => internal_Instr(25 downto 21),
-            A2  => internal_Instr(20 downto 16),
+            A1  => Instr(25 downto 21),
+            A2  => Instr(20 downto 16),
             A3  => internal_A3,
             WD3 => internal_Result,
             WE3 => RegWrite,
@@ -189,8 +192,8 @@ architecture ARCH of DataPath is
 
         MUX5_Register : MUX5 port map(
             Control_5 => RegDst,
-            InA_5     => internal_Instr(20 downto 16),
-            InB_5     => internal_Instr(15 downto 11),
+            InA_5     => Instr(20 downto 16),
+            InB_5     => Instr(15 downto 11),
             In31      => "11111",
             OutputS_5 => internal_A3
         );
@@ -198,7 +201,7 @@ architecture ARCH of DataPath is
 --                   ALU Logic                             --
 -------------------------------------------------------------
         Sign_Ext : SignExt port map(
-            value    => internal_Instr(15 downto 0),
+            value    => Instr(15 downto 0),
             valueEXT => SignImm
         );
 
@@ -208,7 +211,7 @@ architecture ARCH of DataPath is
             InB    	 => SignImm,
             OutputS  => internal_SrcB
         ); 
-
+        ALUOut <= internal_ALUResult;
         ALU_inst : ALU port map (
             ALUControl 	=> ALUControl_U,
             SrcA    	=> internal_RD1,
@@ -224,6 +227,6 @@ architecture ARCH of DataPath is
             Control => MemtoReg,
             InA    	=> internal_ALUResult,
             InB    	=> internal_ReadData,
-            OutputS => ALUOut
+            OutputS => internal_Result
         );     
     end ARCH;
