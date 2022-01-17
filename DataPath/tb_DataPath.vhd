@@ -11,6 +11,7 @@ architecture test of tb_DataPath is
 
 component DataPath is 
     port(
+        Instr        : in std_logic_vector(31 downto 0);
         Reset        : in std_logic;
         clk          : in std_logic;
         ReadData     : in std_logic_vector(31 downto 0);
@@ -21,6 +22,7 @@ component DataPath is
         PCSrc        : in std_logic;
         ALUControl_U : in std_logic_vector(2 downto 0);
         ZEROFlag_U   : out std_logic;
+        PCout        : out std_logic_vector(31 downto 0);
         ALUOut       : out std_logic_vector(31 downto 0);
         WriteData    : out std_logic_vector(31 downto 0)
     );
@@ -44,6 +46,7 @@ end component;
 
     --signal data_in_addres  : std_logic_vector(31 downto 0);
     signal data_in_reset      : std_logic;
+    signal data_in_instr      : std_logic_vector(31 downto 0);
     signal data_in_data       : std_logic_vector(31 downto 0);
     signal data_in_RegWrite   : std_logic := '0';
     signal data_in_ALUSrc     : std_logic;
@@ -53,14 +56,15 @@ end component;
     signal data_in_ALUControl : std_logic_vector(2 downto 0);
     signal in_clk             : std_logic := '0';
     signal ZeroOutput         : std_logic;
-    signal ALUOutin             : std_logic_vector(31 downto 0);
+    signal ALUOutin           : std_logic_vector(31 downto 0);
     signal Writetoutput       : std_logic_vector(31 downto 0);
-    
+    signal PCtoutput          : std_logic_vector(31 downto 0);
     
    
 begin
     DUT : DataPath 
     port map(
+        Instr        => data_in_instr,
         Reset        => data_in_reset,
         RegWrite     => data_in_RegWrite,
         ALUSrc       => data_in_ALUSrc,
@@ -71,6 +75,7 @@ begin
         clk          => in_clk,
         ALUControl_U => data_in_ALUControl,
         ZEROFlag_U   => ZeroOutput,
+        PCout        => PCtoutput,
         ALUOut       => ALUOutin,
         WriteData    => Writetoutput
     );
@@ -92,9 +97,14 @@ variable inputPCSrc    : std_logic;
 variable inputMemToReg : std_logic;
 variable inputRegDst   : std_logic_vector(1 downto 0);
 variable inputALUC     : std_logic_vector(2 downto 0);
+variable inputInstr    : std_logic_vector(31 downto 0);
 begin
 while not endfile(inputs_data_DataPath) loop
     if read_data_inPC = '1' then
+
+        readline(inputs_data_DataPath,linea);
+        read(linea, inputInstr);
+        data_in_instr <= inputInstr;
 
         readline(inputs_data_DataPath,linea);
         read(linea,inputReset);
@@ -170,7 +180,8 @@ variable linea      : line;
 variable lineb      : line;
 variable lineSTR    : line;
 variable comp_outPC : std_logic_vector(31 downto 0);
-variable ALUvOut  : std_logic_vector(31 downto 0);
+variable ALUvOut    : std_logic_vector(31 downto 0);
+variable PCoutDoc   : std_logic_vector(31 downto 0);
 variable Writeout   : std_logic_vector(31 downto 0);
 variable ZeroOut    : std_logic;
 
@@ -183,6 +194,13 @@ begin
             --writeline(outputs_data, lineSTR);
             write(linea,ALUvOut);
             writeline(outputs_data, linea);
+
+            PCoutDoc := PCtoutput;
+            --write(lineSTR, string'("The output is"));
+             --writeline(outputs_data, lineSTR);
+             write(linea,PCoutDoc);
+             writeline(outputs_data, linea);
+            
 
             --To read in order to compare--
             --readline(data_compare, lineb);

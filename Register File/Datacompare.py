@@ -1,5 +1,4 @@
 f = open("InstrandDataRF.txt", "r")
-count = 1
 for x in f:
     with open("inputs.txt", "a") as arquivo:
         Instr = str(x)
