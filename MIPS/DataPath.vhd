@@ -3,20 +3,20 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
  entity DataPath is port(
-    Instr        : in std_logic_vector(31 downto 0);
-    Reset        : in std_logic;
-    clk          : in std_logic;
-    ReadData     : in std_logic_vector(31 downto 0);
-    RegWrite     : in std_logic;
-    RegDst       : in std_logic_vector(1 downto 0);
-    ALUSrc       : in std_logic;
-    MemtoReg     : in std_logic;
-    PCSrc        : in std_logic;
-    ALUControl_U : in std_logic_vector(2 downto 0);
-    ZEROFlag_U   : out std_logic;
-    PCout        : out std_logic_vector(31 downto 0);
-    ALUOut       : out std_logic_vector(31 downto 0);
-    WriteData    : out std_logic_vector(31 downto 0)
+        Instr        : in std_logic_vector(31 downto 0);
+        Reset        : in std_logic;
+        clk          : in std_logic;
+        ReadData     : in std_logic_vector(31 downto 0);
+        RegWrite     : in std_logic;
+        RegDst       : in std_logic_vector(1 downto 0);
+        ALUSrc       : in std_logic;
+        MemtoReg     : in std_logic;
+        PCSrc        : in std_logic;
+        ALUControl_U : in std_logic_vector(2 downto 0);
+        ZEROFlag_U   : out std_logic;
+        PCout        : out std_logic_vector(31 downto 0);
+        ALUOut       : out std_logic_vector(31 downto 0);
+        WriteData    : out std_logic_vector(31 downto 0)
 );
 end DataPath;
 

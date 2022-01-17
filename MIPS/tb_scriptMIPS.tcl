@@ -14,7 +14,6 @@ vcom -explicit  -2008 "MUX5.vhd"
 vcom -explicit  -2008 "PC.vhd"
 vcom -explicit  -2008 "RegisterFile.vhd"
 vcom -explicit  -2008 "ShiftLeft.vhd"
-vcom -explicit  -2008 "ShiftLeftJump.vhd"
 vcom -explicit  -2008 "SignExt.vhd"
 vcom -explicit  -2008 "tb_MIPS.vhd"
 vsim -t 1ns   -lib work tb_MIPS
@@ -23,5 +22,5 @@ add wave sim:/tb_MIPS/*
 view wave
 view structure
 view signals
-run 1000ns
+run 260ns
 #quit -force
