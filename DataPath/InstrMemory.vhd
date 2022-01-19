@@ -42,7 +42,7 @@ rom :=rom'(
     "00000010011101101010100000100100",
     "00000010101101001011100000100101");
 begin
-    rom_addr <= address(9 downto 2);
+    rom_addr <= address(5 downto 2);
     instr <= Instr_data(to_integer(unsigned(rom_addr))) when ((address >= x"00400000") and (address <= x"00400030")) else x"0000000C";    --syscall. The range can be change if there are more instr.
                                                                                                                                           
 end InstrARCH; 
