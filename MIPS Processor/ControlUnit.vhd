@@ -11,7 +11,7 @@ entity ControlUnit is
         PCsrc       : out std_logic;
         ALUControl  : out std_logic_vector(2 downto 0);
         AluSrc      : out std_logic;
-        RegDst      : out std_logic;
+        RegDst      : out std_logic_vector(1 downto 0);
         RegWrite    : out std_logic;
         Jump        : out std_logic
     );
@@ -22,16 +22,16 @@ architecture structControlUnit of ControlUnit is
     --MainDecoder component--
     component MainDecoder is
         port(  
-            OPM          : in std_logic_vector(5 downto 0);
-            MemToRegM    : out std_logic;
-            MemWriteM    : out std_logic;
-            BranchM      : out std_logic;
-            AluSrcM      : out std_logic;
-            RegDstM      : out std_logic;
-            RegWriteM    : out std_logic;
-            jumpM        : out std_logic;
-            ALUopM       : out std_logic_vector(1 downto 0)
-        );
+            OPM        : in std_logic_vector(5 downto 0);
+            MemToRegM  : out std_logic;
+            MemWriteM  : out std_logic;
+            BranchM    : out std_logic;
+            AluSrcM    : out std_logic;
+            RegDstM    : out std_logic_vector(1 downto 0);
+            RegWriteM  : out std_logic;
+            jumpM      : out std_logic;
+            ALUopM     : out std_logic_vector(1 downto 0)
+    );
     end component;
 
     --ALUDecoder component--

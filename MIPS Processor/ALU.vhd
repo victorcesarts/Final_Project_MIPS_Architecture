@@ -29,9 +29,9 @@ architecture ALUCarch of ALU is
 			when "001" =>
 				temp_result <= SrcA or SrcB; --or
 			when "010" =>
-				temp_result <= std_logic_vector(unsigned(SrcA) + unsigned(SrcB)); --add
+				temp_result <= std_logic_vector(signed(SrcA) + signed(SrcB)); --add
 			when "110" =>
-				temp_result <= std_logic_vector(unsigned(SrcA) - unsigned(SrcB)); --sub
+				temp_result <= std_logic_vector(signed(SrcA) - signed(SrcB)); --sub
 			when "111" =>
 				if(SrcA < SrcB) then
 					temp_result <= x"00000001";
@@ -39,7 +39,7 @@ architecture ALUCarch of ALU is
 					temp_result <= x"00000000";
 				end if;
 			when others =>
-			temp_result <= (others => 'X');
+				temp_result <= (others => 'X');
 	end case;
 	ALUResult <=  temp_result;
 	if (temp_result = x"00000000") then
