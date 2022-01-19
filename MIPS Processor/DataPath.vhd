@@ -2,230 +2,231 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity DataPath is 
-    port(
-        clk   : in std_logic;
-        reset : in std_logic;
-       -- MemWrite : in std_logic;
-        MemToReg : in std_logic;
-        RegWrite : in std_logic;
-        ALUSrc : in std_logic;
-        ALUControl : in std_logic_vector(2 downto 0);
-        RegDST : in std_logic;
-        Jump : in std_logic;
-        Instr : in std_logic_vector(31 downto 0);
-        Pcsrc : in std_logic;
-        ReadData : in std_logic_vector(31 downto 0);
-        WriteData : out std_logic_vector(31 downto 0);
-        PC_OUT : out std_logic_vector(31 downto 0);
-        Excpetion : out std_logic;
-        Zero : out std_logic;
-        ALUOut : out std_logic_vector(31 downto 0)
-    );
-    end DataPath;
+ entity DataPath is port(
+        Instr        : in std_logic_vector(31 downto 0);
+        Reset        : in std_logic;
+        clk          : in std_logic;
+        ReadData     : in std_logic_vector(31 downto 0);
+        RegWrite     : in std_logic;
+        RegDst       : in std_logic_vector(1 downto 0);
+        ALUSrc       : in std_logic;
+        MemtoReg     : in std_logic;
+        PCSrc        : in std_logic;
+        ALUControl_U : in std_logic_vector(2 downto 0);
+        ZEROFlag_U   : out std_logic;
+        PCout        : out std_logic_vector(31 downto 0);
+        ALUOut       : out std_logic_vector(31 downto 0);
+        WriteData    : out std_logic_vector(31 downto 0)
+);
+end DataPath;
 
-    architecture Arch of DataPath is
-        component Adder
-            port(
-                InA   : in std_logic_vector(31 downto 0);
-                InB   : in std_logic_vector(31 downto 0);
-                Result : out std_logic_vector(31 downto 0)
-            );
-        end component;
+architecture ARCH of DataPath is
+-------------------------------------------------------------
+--                   COMPONENTS BEGIN                     --
+-------------------------------------------------------------
+    --component InstrMemory is port(
+      --  address : in std_logic_vector(31 downto 0);
+        --instr   : out std_logic_vector(31 downto 0)
+    --);
+    --end component;
 
-        component ALU 
-            port (
-                ALUControl 	: in    std_logic_vector(2 downto 0);
-                SrcA    	: in    std_logic_vector(31 downto 0);
-                SrcB    	: in    std_logic_vector(31 downto 0);
-                ZEROFlag  	: out   std_logic;
-                ALUResult	: out   std_logic_vector(31 downto 0)
-            );
-        end component;
-        
-        component MUX 
-            port (
-                Control 	: in    std_logic;
-                InA    	    : in    std_logic_vector(31 downto 0);
-                InB    	    : in    std_logic_vector(31 downto 0);
-                OutputS  	: out   std_logic_vector(31 downto 0)
-            );
-        end component;
-
-        component PC 
-            port(
-                pcin         : in std_logic_vector(31 downto 0);
-			    clk, reset   : in std_logic;
-			    overflowFlag : out std_logic;
-			    pcout        : out std_logic_vector(31 downto 0)
-	        );
-        end component;
-
-        component RegisterFile
+    component RegisterFile is
         port(
-            A1 : in std_logic_vector(4 downto 0);
-            A2 : in std_logic_vector(4 downto 0);
-            A3 : in std_logic_vector(4 downto 0);
+            A1  : in std_logic_vector(4 downto 0);
+            A2  : in std_logic_vector(4 downto 0);
+            A3  : in std_logic_vector(4 downto 0);
             WD3 : in std_logic_vector(31 downto 0);
             WE3 : in std_logic;
             clk : in std_logic;
             RD1 : out std_logic_vector(31 downto 0);
             RD2 : out std_logic_vector(31 downto 0)
         );
-		  end component;
+    end component;
 
-        component ShiftLeft 
-            port(
-                InSll  : in std_logic_vector(31 downto 0);
-                OutSll : out std_logic_vector(31 downto 0)
-            );
-        end component;
+    component ALU is
+        port (
+            ALUControl 	: in    std_logic_vector(2 downto 0);
+            SrcA    	: in    std_logic_vector(31 downto 0);
+            SrcB    	: in    std_logic_vector(31 downto 0);
+            ZEROFlag  	: out   std_logic;
+            ALUResult   : out   std_logic_vector(31 downto 0)
+        );
+    end component;
 
-        component ShiftLeftJump is
-            port(
-                InSll  : in std_logic_vector(25 downto 0);
-                OutSll : out std_logic_vector(25 downto 0)
-            );
-        end component;
+    component MUX is
+        port (
+            Control : in    std_logic;
+            InA    	: in    std_logic_vector(31 downto 0);
+            InB    	: in    std_logic_vector(31 downto 0);
+            OutputS : out   std_logic_vector(31 downto 0)
+        );
+    end component;
 
-        component SignExt
-            port(
-                value : in std_logic_vector(15 downto 0);
-                valueEXT : out std_logic_vector(31 downto 0)
-            );
-        end component;
+    component SignExt is
+        port(
+            value    : in std_logic_vector(15 downto 0);
+            valueEXT : out std_logic_vector(31 downto 0)
+        );
+     end component;
 
-        component MUX5
-            port (
-                Control_5 	: in    std_logic;
-                InA_5   	: in    std_logic_vector(4 downto 0);
-                InB_5   	: in    std_logic_vector(4 downto 0);
-                OutputS_5 	: out   std_logic_vector(4 downto 0)
-            );
-        end component;
+    component MUX5 is
+        port (
+            Control_5 : in    std_logic_vector(1 downto 0);
+            InA_5     : in    std_logic_vector(4 downto 0);
+            InB_5     : in    std_logic_vector(4 downto 0);
+            In31      : in    std_logic_vector(4 downto 0);
+            OutputS_5 : out   std_logic_vector(4 downto 0)
+        );
+    end component;
 
-            -- Internal signals ALU --
-            signal internal_ALUResult : std_logic_vector(31 downto 0);
+    component PC is 
+        port(
+			pcin       : in std_logic_vector(31 downto 0);
+			clk, reset : in std_logic;
+			pcout      : out std_logic_vector(31 downto 0)
+	    );
+    end component;
 
-            -- Internal signals MUX ALU --
-            signal internal_OutputSrc : std_logic_vector(31 downto 0);
+    component Adder is
+        port(
+            InA    : in std_logic_vector(31 downto 0);
+            InB    : in std_logic_vector(31 downto 0);
+            Result : out std_logic_vector(31 downto 0)
+        );
+    end component;
 
-            -- Internal signals MUX Data Memory --
-            signal Result_dataMEM : std_logic_vector(31 downto 0);
+    component ShiftLeft is
+        port(
+            InSll  : in std_logic_vector(31 downto 0);
+            OutSll : out std_logic_vector(31 downto 0)
+        );
+    end component;
+-------------------------------------------------------------
+--                   END COMPONENTS                        --
+-------------------------------------------------------------
 
-            -- Internal signals MUX Register File --
-            signal WriteReg : std_logic_vector(4 downto 0);    
+--                   REGISTER SIGNALS                      --
+    signal internal_RD1    : std_logic_vector(31 downto 0);
+    signal internal_RD2    : std_logic_vector(31 downto 0);
+    signal internal_A3     : std_logic_vector(4 downto 0);
+    signal internal_Result : std_logic_vector(31 downto 0);
 
-            -- Internal signals Register file --
-            signal internal_RD1 : std_logic_vector(31 downto 0);
-            signal internal_RD2 : std_logic_vector(31 downto 0);
-            
-            -- Internal signals Sign Extend --
-            signal internal_valueEXT : std_logic_vector(31 downto 0);
+--                   INSTR. MEMORY SIGNALS                 --
+    signal internal_Instr : std_logic_vector(31 downto 0);
 
-            -- Internal signals PC --
-            signal PC_next : std_logic_vector(31 downto 0);
-            signal PC_plus4 : std_logic_vector(31 downto 0);
-            signal PC_Branch : std_logic_vector(31 downto 0);
+--                   SIGN EXTEND SIGNALS                   --
+    signal SignImm : std_logic_vector(31 downto 0);
 
-            -- Internal signals MUX PC --
-            signal Result_PC : std_logic_vector(31 downto 0);
+--                   ALU SIGNALS                           --
+    signal internal_SrcB      : std_logic_vector(31 downto 0);
+    signal internal_ALUResult : std_logic_vector(31 downto 0);
 
-            -- Internal signals Shift Left PC --
-            signal OutSll_PC : std_logic_vector(31 downto 0);
+--                   DATA MEMORY SIGNALS                   --
+    signal internal_ReadData : std_logic_vector(31 downto 0);
 
-            -- Internal signals Shift Left PC JUMP --
-            signal OutSll_PCJUMP : std_logic_vector(25 downto 0);
-				
+--                   PC SIGNALS                            --
+    signal PCplus4         : std_logic_vector(31 downto 0);
+    signal internal_PCout  : std_logic_vector(31 downto 0);
+    signal PC_branch       : std_logic_vector(31 downto 0);
+    signal PC_in           : std_logic_vector(31 downto 0);
+    signal internal_AdderB : std_logic_vector(31 downto 0);
 
-        begin
-            ALUOut <= internal_ALUResult;
-            -- BEGIN OF ALU LOGIC --
-            ALU_inst : ALU port map(
-                ALUControl => ALUControl, 
-                SrcA => internal_RD1,
-                SrcB => internal_OutputSrc,
-                ZEROFlag => Zero,
-                ALUResult => internal_ALUResult
-            );
-            MUX_ALU : MUX port map(
-                Control => ALUSrc,
-                InA => internal_RD2,
-                InB => internal_valueEXT,
-                OutputS => internal_OutputSrc
-            );
-            -- END OF ALU LOGIC --
+    begin
+-------------------------------------------------------------
+--                   PC Logic                     --
+-------------------------------------------------------------
+        PCout <= internal_PCout;
+        PC_inst : PC port map(
+            pcin  => PC_in,
+			clk   => clk,
+            reset => Reset,
+			pcout => internal_PCout
+        );
+        
+        Adder_PC : Adder port map(
+            InA    => internal_PCout,
+            InB    => x"00000004",
+            Result => PCplus4
+        );
 
-            -- BEGIN OF REGISTER FILE LOGIC --
-            RegisterFile_inst : RegisterFile port map(
-                A1 => instr(25 downto 21),
-                A2 => instr(20 downto 16),
-                A3 => WriteReg,
-                WD3 => Result_dataMEM,
-                WE3 => RegWrite,
-                clk => clk,
-                RD1 => internal_RD1,
-                RD2 => internal_RD2
-            );
-				WriteData <= internal_RD2;
-            
-            MUX_RegFile : MUX5 port map(
-                Control_5 => RegDST,
-                InA_5 => Instr(20 downto 16),
-                InB_5 => Instr(15 downto 11),
-                OutputS_5  => WriteReg
-            );
-            MUX_DataMemory : MUX port map(
-                Control => MemToReg,
-                InA => internal_ALUResult,
-                InB => ReadData,
-                OutputS => Result_dataMEM
-            );
-            -- END OF REGISTER FILE LOGIC --
+        Adder_Branch : Adder port map(
+            InA    => internal_AdderB,
+            InB    => PCplus4,
+            Result => PC_branch
+        );
 
-            -- BEGIN OF SIGN EXTEND LOGIC --
-            SignExt_inst : SignExt port map(
-                value => Instr(15 downto 0),
-                valueEXT => internal_valueEXT
-            );
-            -- END OF SIGN EXTEND LOGIC --
+        MUX_PC : MUX port map(
+            Control  => PCSrc,
+            InA    	 => PCplus4,
+            InB    	 => PC_branch,
+            OutputS  => PC_in
+        );
 
-            -- BEGIN OF PC LOGIC --
-            PC_inst : PC port map(
-                pcin => PC_next,         
-			    clk => clk, 
-                reset => reset,  
-			    overflowFlag => Excpetion, 
-			    pcout => PC_OUT        
-            );
-            ADDER_PC : ADDER port map(
-                InA   => PC_next,
-                InB   => x"00000004",
-                Result => PC_plus4
-            );
-            ShiftLeft_PC : ShiftLeft port map(
-                InSll  => internal_valueEXT,
-                OutSll => OutSll_PC
-            );
-            ShiftLeft_JUMP : ShiftLeftJump port map(
-                InSll  => Instr(25 downto 0),
-                OutSll => OutSll_PCJUMP
-            );
-            ADDER_PCbranch : ADDER port map(
-                InA   => OutSll_PC,
-                InB   => PC_plus4,
-                Result => PC_Branch
-            );
-            MUX_PC : MUX port map(
-                Control => Pcsrc,
-                InA => PC_plus4,
-                InB => PC_Branch,
-                OutputS => Result_PC
-            );
-            MUX_JUMPPC : MUX port map(
-                Control => Jump,
-                InA => Result_PC,
-                InB => PC_plus4(31 downto 28)  & (OutSll_PCJUMP) & "00",
-                OutputS => PC_next
-            );
-    end Arch;
+        ShiftL_PC : ShiftLeft port map(
+            InSll  => SignImm,
+            OutSll => internal_AdderB
+        );
+-------------------------------------------------------------
+--                   Instruction Logic                     --
+-------------------------------------------------------------
+     --   Instr_inst : InstrMemory  port map(
+      --      address => internal_PCout,
+        --    instr   => internal_Instr
+        --);
+
+-------------------------------------------------------------
+--                   Register File Logic                   --
+-------------------------------------------------------------
+       
+       WriteData <= internal_RD2;
+        Reg_inst : RegisterFile port map(
+            A1  => Instr(25 downto 21),
+            A2  => Instr(20 downto 16),
+            A3  => internal_A3,
+            WD3 => internal_Result,
+            WE3 => RegWrite,
+            clk => clk,
+            RD1 => internal_RD1,
+            RD2 => internal_RD2 
+        );
+
+        MUX5_Register : MUX5 port map(
+            Control_5 => RegDst,
+            InA_5     => Instr(20 downto 16),
+            InB_5     => Instr(15 downto 11),
+            In31      => "11111",
+            OutputS_5 => internal_A3
+        );
+-------------------------------------------------------------
+--                   ALU Logic                             --
+-------------------------------------------------------------
+        Sign_Ext : SignExt port map(
+            value    => Instr(15 downto 0),
+            valueEXT => SignImm
+        );
+
+        MUX_ALU : MUX port map(
+            Control  => ALUSrc,
+            InA    	 => internal_RD2,
+            InB    	 => SignImm,
+            OutputS  => internal_SrcB
+        ); 
+        ALUOut <= internal_ALUResult;
+        ALU_inst : ALU port map (
+            ALUControl 	=> ALUControl_U,
+            SrcA    	=> internal_RD1,
+            SrcB    	=> internal_SrcB,
+            ZEROFlag  	=> ZEROFlag_U,
+            ALUResult	=> internal_ALUResult
+        );
+-------------------------------------------------------------
+--                   Data Memory                           --
+-------------------------------------------------------------
+        internal_ReadData <= ReadData;
+        MUX_DataMem : MUX port map(
+            Control => MemtoReg,
+            InA    	=> internal_ALUResult,
+            InB    	=> internal_ReadData,
+            OutputS => internal_Result
+        );     
+    end ARCH;
