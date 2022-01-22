@@ -32,12 +32,13 @@ architecture ARCH of DataPath is
 
     component RegisterFile is
         port(
-            A1  : in std_logic_vector(4 downto 0);
-            A2  : in std_logic_vector(4 downto 0);
-            A3  : in std_logic_vector(4 downto 0);
+            A1 : in std_logic_vector(4 downto 0);
+            A2 : in std_logic_vector(4 downto 0);
+            A3 : in std_logic_vector(4 downto 0);
             WD3 : in std_logic_vector(31 downto 0);
             WE3 : in std_logic;
             clk : in std_logic;
+            reset : in std_logic;
             RD1 : out std_logic_vector(31 downto 0);
             RD2 : out std_logic_vector(31 downto 0)
         );
@@ -185,7 +186,8 @@ architecture ARCH of DataPath is
             A3  => internal_A3,
             WD3 => internal_Result,
             WE3 => RegWrite,
-            clk => clk,
+            clk   => clk,
+            reset => Reset,
             RD1 => internal_RD1,
             RD2 => internal_RD2 
         );

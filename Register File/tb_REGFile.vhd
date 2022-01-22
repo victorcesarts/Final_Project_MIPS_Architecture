@@ -11,14 +11,15 @@ architecture test of tb_REGFile is
 
 component RegisterFile is 
 port(
-        A1 : in std_logic_vector(4 downto 0);
-        A2 : in std_logic_vector(4 downto 0);
-        A3 : in std_logic_vector(4 downto 0);
-        WD3 : in std_logic_vector(31 downto 0);
-        WE3 : in std_logic;
-        clk : in std_logic;
-        RD1 : out std_logic_vector(31 downto 0);
-        RD2 : out std_logic_vector(31 downto 0)
+        A1    : in std_logic_vector(4 downto 0);
+        A2    : in std_logic_vector(4 downto 0);
+        A3    : in std_logic_vector(4 downto 0);
+        WD3   : in std_logic_vector(31 downto 0);
+        WE3   : in std_logic;
+        clk   : in std_logic;
+        reset : in std_logic;
+        RD1   : out std_logic_vector(31 downto 0);
+        RD2   : out std_logic_vector(31 downto 0)
     );
 
 end component;
@@ -38,29 +39,31 @@ end component;
     --2895622
 
     signal read_data_inREG : std_logic:='0';
-    signal flag_write	  : std_logic:='0';
+    signal flag_write	   : std_logic:='0';
 
-    signal data_A1        : std_logic_vector(4 downto 0);
-    signal data_A2        : std_logic_vector(4 downto 0);
-    signal data_A3        : std_logic_vector(4 downto 0);
-    signal data_WD3        : std_logic_vector(31 downto 0);
-    signal data_WE3        : std_logic;
-    signal data_RD1       : std_logic_vector(31 downto 0);
-    signal data_RD2        : std_logic_vector(31 downto 0);
-    signal data_CLK        : std_logic := '0';
+    signal data_A1    : std_logic_vector(4 downto 0);
+    signal data_A2    : std_logic_vector(4 downto 0);
+    signal data_A3    : std_logic_vector(4 downto 0);
+    signal data_WD3   : std_logic_vector(31 downto 0);
+    signal data_WE3   : std_logic;
+    signal data_RD1   : std_logic_vector(31 downto 0);
+    signal data_RD2   : std_logic_vector(31 downto 0);
+    signal data_CLK   : std_logic := '0';
+    signal data_Reset : std_logic := '0';
    
    
 begin
     DUT : RegisterFile 
     port map(
-        A1  => data_A1,
-        A2  => data_A2, 
-        A3  => data_A3, 
-        WD3 => data_WD3,
-        WE3 => data_WE3,
-        RD1 => data_RD1,
-        RD2 => data_RD2,
-        clk => data_CLK
+        A1    => data_A1,
+        A2    => data_A2, 
+        A3    => data_A3, 
+        WD3   => data_WD3,
+        WE3   => data_WE3,
+        RD1   => data_RD1,
+        RD2   => data_RD2,
+        clk   => data_CLK,
+        reset => data_Reset
     );
 
     data_CLK <= not data_CLK after PERIOD/5;

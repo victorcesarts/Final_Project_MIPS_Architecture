@@ -57,22 +57,23 @@ architecture ARCH of MIPS is
     signal internal_ALUControl : std_logic_vector(2 downto 0);   
 	signal internal_Zero       : std_logic;
     signal internal_jump       : std_logic;
+    
     begin
         DataPath_inst : DataPath port map(
-        Instr        => Instruction,   
-        Reset        => reset,
-        clk          => clk,
-        ReadData     => ReadData,
-        RegWrite     => internal_RegWrite,
-        RegDst       => internal_RegDST, 
-        ALUSrc       => internal_ALUSrc,
-        MemtoReg     => internal_MemToReg,
-        PCSrc        => internal_PCsrc,
-        ALUControl_U => internal_ALUControl,
-        PCout        => PC,
-        ZEROFlag_U   => internal_Zero,
-        ALUOut       => ALUOut,
-        WriteData    => WriteData
+            Instr        => Instruction,   
+            Reset        => reset,
+            clk          => clk,
+            ReadData     => ReadData,
+            RegWrite     => internal_RegWrite,
+            RegDst       => internal_RegDST, 
+            ALUSrc       => internal_ALUSrc,
+            MemtoReg     => internal_MemToReg,
+            PCSrc        => internal_PCsrc,
+            ALUControl_U => internal_ALUControl,
+            PCout        => PC,
+            ZEROFlag_U   => internal_Zero,
+            ALUOut       => ALUOut,
+            WriteData    => WriteData
         );
 
         ControlUnit_inst : ControlUnit port map(
