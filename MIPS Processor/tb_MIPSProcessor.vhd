@@ -13,8 +13,8 @@ component MIPSProcessor is
     port(
         clk         : in std_logic;
         reset       : in std_logic;
-        Instr       : out std_logic_vector(31 downto 0);
-        ReadData    : out std_logic_vector(31 downto 0)
+        Instr_MIPS      : out std_logic_vector(31 downto 0);
+		ReadData_MIPS   : out std_logic_vector(15 downto 0)
     );
 end component;
 
@@ -28,14 +28,14 @@ end component;
     file	outputs_data_comp : text open write_mode is "outputdata_comp.txt";
 
     constant min_value	: natural := 1;
-    constant max_value  : natural := 13;
+    constant max_value  : natural := 14;
 
     signal flag_write	: std_logic:='0';
 
     signal data_CLK     : std_logic := '0';
     signal data_reset   : std_logic := '0';
     signal Instr_out    : std_logic_vector(31 downto 0);
-    signal ReadData_out : std_logic_vector(31 downto 0);
+    signal ReadData_out : std_logic_vector(15 downto 0);
     
     
 begin
@@ -43,14 +43,14 @@ begin
     port map(
         clk      => data_CLK,
         reset    => data_reset,
-        Instr    => Instr_out,
-        ReadData => ReadData_out
+        Instr_MIPS    => Instr_out,
+        ReadData_MIPS => ReadData_out
     );
 
-data_CLK <= not data_CLK after PERIOD/5;
+data_CLK <= not data_CLK after PERIOD/2;
 
 
-data_reset <= '0', '1' after 15 ns, '0' after 18 ns;   
+data_reset <= '0', '1' after 15 ns, '0' after 22 ns, '1' after 125 ns, '0' after 135 ns;   
 
 ------------------------------------------------------------------------------------
 ------ processo para gerar os estimulos de escrita do arquivo de saida
@@ -71,50 +71,50 @@ END PROCESS tb_outputs;
 write_outputs:process
 variable linea            : line;
 variable lineSTR          : line;
-variable compInstr_out    : std_logic_vector(31 downto 0);
-variable compReadData_out : std_logic_vector(31 downto 0);
+variable compInstr_out    : std_logic_vector(15 downto 0);
+variable compReadData_out : std_logic_vector(15 downto 0);
 variable InstrOutput      : std_logic_vector(31 downto 0);
-variable ReadDataOutput   : std_logic_vector(31 downto 0);
+variable ReadDataOutput   : std_logic_vector(15 downto 0);
 
 begin
     while true loop
         if (flag_write ='1')then
             InstrOutput := Instr_out;
-            write(lineSTR, string'("Instruction"));
-            writeline(outputs_data, lineSTR);
+            --write(lineSTR, string'("Instruction"));
+            --writeline(outputs_data, lineSTR);
             write(linea,InstrOutput);
             writeline(outputs_data, linea);
 
             --To read in order to compare--
-            readline(data_compare, linea);
-			read(linea, compInstr_out);
-            assert compInstr_out = InstrOutput  report "ERROR" severity warning;
+           -- readline(data_compare, linea);
+			--read(linea, compInstr_out);
+            --assert compInstr_out = InstrOutput  report "ERROR" severity warning;
             --Writing if the output it's good or not--
-            if (compInstr_out /= InstrOutput) then
-                write(lineSTR, string'("Error"));
-                writeline(outputs_data_comp, lineSTR);
-            else
-                write(lineSTR, string'("Good"));
-                writeline(outputs_data_comp, lineSTR);
-            end if;
+            --if (compInstr_out /= InstrOutput) then
+             --   write(lineSTR, string'("Error"));
+             --   writeline(outputs_data_comp, lineSTR);
+            --else
+             --   write(lineSTR, string'("Good"));
+              --  writeline(outputs_data_comp, lineSTR);
+            --end if;
 
             ReadDataOutput := ReadData_out;
-            write(lineSTR, string'("ALUOut"));
-            writeline(outputs_data, lineSTR);
+            --write(lineSTR, string'("DATA"));
+            --writeline(outputs_data, lineSTR);
             write(linea,ReadDataOutput);
             writeline(outputs_data, linea);
             --To read in order to compare--
-            readline(data_compare, linea);
-			read(linea, compReadData_out);
-            assert compReadData_out = ReadDataOutput  report "ERROR" severity warning;
+            --readline(data_compare, linea);
+			--read(linea, compReadData_out);
+            --assert compReadData_out = ReadDataOutput  report "ERROR" severity warning;
            -- Writing if the output it's good or not--
-            if (compReadData_out /= ReadDataOutput) then
-                write(lineSTR, string'("Error"));
-                writeline(outputs_data_comp, lineSTR);
-            else
-                write(lineSTR, string'("Good"));
-                writeline(outputs_data_comp, lineSTR);
-            end if;
+            --if (compReadData_out /= ReadDataOutput) then
+            --    write(lineSTR, string'("Error"));
+             --   writeline(outputs_data_comp, lineSTR);
+            --else
+             --   write(lineSTR, string'("Good"));
+            --    writeline(outputs_data_comp, lineSTR);
+            --end if;
 
             write(lineSTR, string'("-------------------------"));
             writeline(outputs_data, lineSTR);

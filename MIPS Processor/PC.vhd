@@ -15,9 +15,9 @@ end PC;
         begin
             --if ((pcin >= x"00400000") and (pcin <= x"0FFFFFFD")) then
                 --overflowFlag <= '0';
-                if (reset = '1') then 
+                if (reset = '1' and rising_edge(clk)) then 
                     pcout <= x"00400000";           
-                elsif(rising_edge(clk)) then
+                elsif(rising_edge(clk) and reset = '0') then
                     pcout <= pcin;
             end if;
 			end process;

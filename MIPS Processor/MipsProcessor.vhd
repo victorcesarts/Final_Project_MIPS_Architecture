@@ -4,10 +4,10 @@ use ieee.numeric_std.all;
 
 entity MipsProcessor is 
     port(
-        clk         : in std_logic;
-        reset       : in std_logic;
-        Instr       : out std_logic_vector(31 downto 0);
-		ReadData    : out std_logic_vector(31 downto 0)
+        clk           : in std_logic;
+        reset         : in std_logic;
+        Instr_MIPS    : out std_logic_vector(31 downto 0);
+		ReadData_MIPS : out std_logic_vector(15 downto 0)
     );
     end entity;
 
@@ -17,9 +17,9 @@ entity MipsProcessor is
         signal internal_pc : std_logic_vector(31 downto 0);
 
         --              Internal signals DataMEM            --
-        signal internal_alu : std_logic_vector(31 downto 0);
-        signal internal_WD : std_logic_vector(31 downto 0);
-        signal internal_WE : std_logic;
+        signal internal_alu      : std_logic_vector(31 downto 0);
+        signal internal_WD       : std_logic_vector(31 downto 0);
+        signal internal_WE       : std_logic;
 		signal internal_ReadData : std_logic_vector(31 downto 0);
 
         component MIPS is port(
@@ -33,9 +33,11 @@ entity MipsProcessor is
         );
     end component;
 
-    component InstrMemory is port(
+    component InstrMemory is 
+    generic (N : integer);
+    port(
         address : in std_logic_vector(31 downto 0);
-        instr : out std_logic_vector(31 downto 0)
+        instr   : out std_logic_vector(31 downto 0)
     );
     end component;
 
@@ -50,21 +52,22 @@ entity MipsProcessor is
     end component;
 
     begin 
-
     MIPS_inst : MIPS port map(
-        clk   => clk,
-        reset => reset,
-        ReadData => internal_ReadData,
+        clk         => clk,
+        reset       => reset,
+        ReadData    => internal_ReadData,
         Instruction => internal_instr,
-        PC => internal_pc,
-        ALUOut => internal_alu,
-        WriteData => internal_WD,
-        MemWrite => internal_WE		  
+        PC          => internal_pc,
+        ALUOut      => internal_alu,
+        WriteData   => internal_WD,
+        MemWrite    => internal_WE		  
     );
     
-    InstrMem_inst : InstrMemory port map(
+    InstrMem_inst : InstrMemory 
+    generic map(N => 8)
+    port map(
         address => internal_pc,
-        instr => internal_instr
+        instr   => internal_instr
     );
 
     DataMEM_inst : DataMemory port map(
@@ -75,7 +78,7 @@ entity MipsProcessor is
 		ReadDataOut => internal_ReadData
     );
 
-    ReadData <= internal_ReadData;
-    Instr <= internal_instr;
+    ReadData_MIPS <= internal_ReadData(15 downto 0);
+    Instr_MIPS <= internal_instr(31 downto 0);
     end MipsProcARCH;
     

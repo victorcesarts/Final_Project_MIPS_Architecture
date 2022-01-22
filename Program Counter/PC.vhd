@@ -9,7 +9,7 @@ entity PC is
 	);
 end PC;
 
-        architecture PCArch of PC is
+    architecture PCArch of PC is
 	 begin   
         process (clk, reset)
         begin
