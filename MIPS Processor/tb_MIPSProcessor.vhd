@@ -28,7 +28,7 @@ end component;
     file	outputs_data_comp : text open write_mode is "outputdata_comp.txt";
 
     constant min_value	: natural := 1;
-    constant max_value  : natural := 14;
+    constant max_value  : natural := 15;
 
     signal flag_write	: std_logic:='0';
 

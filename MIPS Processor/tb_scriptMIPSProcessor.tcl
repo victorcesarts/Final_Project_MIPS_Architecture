@@ -27,5 +27,5 @@ sim:/tb_mipsprocessor/DUT/InstrMem_inst/rom_addr
 view wave
 view structure
 view signals
-run 230 ns
+run 260 ns
 #quit -force
