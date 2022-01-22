@@ -21,9 +21,11 @@ vcom -explicit  -2008 "InstrMemory.vhd"
 vcom -explicit  -2008 "tb_MIPSProcessor.vhd"
 vsim -t 1ns   -lib work tb_MIPSProcessor
 add wave sim:/tb_MIPSProcessor/*
+add wave -position insertpoint  \
+sim:/tb_mipsprocessor/DUT/InstrMem_inst/rom_addr
 #do {wave.do}
 view wave
 view structure
 view signals
-run 100ns
+run 230 ns
 #quit -force

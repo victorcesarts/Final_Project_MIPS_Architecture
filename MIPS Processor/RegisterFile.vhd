@@ -4,24 +4,27 @@ use ieee.numeric_std.all;
 
 entity RegisterFile is
     port(
-        A1 : in std_logic_vector(4 downto 0);
-        A2 : in std_logic_vector(4 downto 0);
-        A3 : in std_logic_vector(4 downto 0);
-        WD3 : in std_logic_vector(31 downto 0);
-        WE3 : in std_logic;
-        clk : in std_logic;
-        RD1 : out std_logic_vector(31 downto 0);
-        RD2 : out std_logic_vector(31 downto 0)
+        A1    : in std_logic_vector(4 downto 0);
+        A2    : in std_logic_vector(4 downto 0);
+        A3    : in std_logic_vector(4 downto 0);
+        WD3   : in std_logic_vector(31 downto 0);
+        WE3   : in std_logic;
+        clk   : in std_logic;
+        reset : in std_logic;
+        RD1   : out std_logic_vector(31 downto 0);
+        RD2   : out std_logic_vector(31 downto 0)
     );
 end RegisterFile;
 
 architecture REGFileARCH of RegisterFile is
         type regtype is array (31 downto 0) of std_logic_vector(31 downto 0);
-        signal reg : regtype;
+        signal reg : regtype := (others => (others => '0'));
     begin
         process(clk) begin
             if (rising_edge(clk)) then
-                if (WE3 = '1') then
+                if (reset = '1') then
+                reg <= (others => (others => '0'));
+            elsif (WE3 = '1') then
                     reg(to_integer(unsigned(A3))) <= WD3;
                 end if;
             end if;
