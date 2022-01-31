@@ -35,7 +35,7 @@ end component;
     file	outputs_data_comp : text open write_mode is "outputdata_comp.txt";
 
     constant min_value  : natural := 1;
-    constant max_value  : natural := 13;
+    constant max_value  : natural := 28;
     --2895622
 
     signal read_data_inREG : std_logic:='0';
@@ -65,7 +65,7 @@ begin
         clk   => data_CLK,
         reset => data_Reset
     );
-
+    data_Reset <= '1' after 125 ns, '0' after 317 ns;
     data_CLK <= not data_CLK after PERIOD/5;
 
 ------------------------------------------------------------------------------------
@@ -86,15 +86,19 @@ while not endfile(inputs_data_REG) loop
         readline(inputs_data_REG,linea);
         read(linea,inputA1);
         data_A1 <= inputA1;
+
         readline(inputs_data_REG,linea);
         read(linea,inputA2);
         data_A2 <= inputA2;
+
         readline(inputs_data_REG,linea);
         read(linea,inputA3);
         data_A3 <= inputA3;
+
         readline(inputs_data_REG,linea);
         hread(linea,inputWD3);
         data_WD3 <= inputWD3;
+
         readline(inputs_data_REG,linea);
         read(linea,inputWE3);
         data_WE3 <= inputWE3;

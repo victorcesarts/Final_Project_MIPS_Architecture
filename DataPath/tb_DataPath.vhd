@@ -29,9 +29,9 @@ component DataPath is
 end component;
 
     -- Clock period definitions
-    constant PERIOD     : time := 15 ns;
+    constant PERIOD     : time := 20 ns;
     constant DUTY_CYCLE : real := 0.5;
-    constant OFFSET     : time := 5 ns;
+    constant OFFSET     : time := 10 ns;
 
     file	inputs_data_DataPath   : text open read_mode  is "inputDataPath.txt";
   -- file	data_compare      : text open read_mode  is "inputcompare.txt";
@@ -39,13 +39,13 @@ end component;
     file	outputs_data_comp : text open write_mode is "outputdata_comp.txt";
 
     constant min_value  : natural := 1;
-    constant max_value  : natural := 13;
+    constant max_value  : natural := 26;
 
     signal read_data_inPC : std_logic:='0';
     signal flag_write	  : std_logic:='0';
 
     --signal data_in_addres  : std_logic_vector(31 downto 0);
-    signal data_in_reset      : std_logic;
+    signal data_in_reset      : std_logic := '0';
     signal data_in_instr      : std_logic_vector(31 downto 0);
     signal data_in_data       : std_logic_vector(31 downto 0);
     signal data_in_RegWrite   : std_logic := '0';
@@ -59,7 +59,7 @@ end component;
     signal ALUOutin           : std_logic_vector(31 downto 0);
     signal Writetoutput       : std_logic_vector(31 downto 0);
     signal PCtoutput          : std_logic_vector(31 downto 0);
-    
+    signal Temp               : std_logic := '0';    
    
 begin
     DUT : DataPath 
@@ -79,8 +79,15 @@ begin
         ALUOut       => ALUOutin,
         WriteData    => Writetoutput
     );
-
-    in_clk <= not in_clk after PERIOD/2;
+    Temp <= '1' after 40 ns;
+clk : process
+begin
+    if Temp = '1' then
+    in_clk <= not in_clk;
+    end if;
+    wait for DUTY_CYCLE*PERIOD;
+end process;
+    
     
 
 ------------------------------------------------------------------------------------
@@ -88,7 +95,6 @@ begin
 ------------------------------------------------------------------------------------
 data_U : process
 variable linea         : line;
-variable inputAddress  : std_logic_vector(31 downto 0);
 variable inputData     : std_logic_vector(31 downto 0);
 variable inputReg      : std_logic;
 variable inputReset    : std_logic;
@@ -107,10 +113,6 @@ while not endfile(inputs_data_DataPath) loop
         data_in_instr <= inputInstr;
 
         readline(inputs_data_DataPath,linea);
-        read(linea,inputReset);
-        data_in_reset <= inputReset;
-
-        readline(inputs_data_DataPath,linea);
         hread(linea,inputData);
         data_in_data <= inputData;
 
@@ -119,24 +121,24 @@ while not endfile(inputs_data_DataPath) loop
         data_in_RegWrite <= inputReg;
 
         readline(inputs_data_DataPath,linea);
-        read(linea,inputALUC);
-        data_in_ALUControl <= inputALUC;
+        read(linea,inputRegDst);
+        data_in_RegDst <= inputRegDst;
 
         readline(inputs_data_DataPath,linea);
         read(linea,inputALUSrc);
         data_in_ALUSrc <= inputALUSrc;
 
         readline(inputs_data_DataPath,linea);
-        read(linea,inputPCSrc);
-        data_in_PCSrc <= inputPCSrc;
-
-        readline(inputs_data_DataPath,linea);
-        read(linea,inputRegDst);
-        data_in_RegDst <= inputRegDst;
-
-        readline(inputs_data_DataPath,linea);
         read(linea,inputMemToReg);
         data_in_MemtoReg <= inputMemToReg;
+
+        readline(inputs_data_DataPath,linea);
+        read(linea,inputALUC);
+        data_in_ALUControl <= inputALUC;
+
+        readline(inputs_data_DataPath,linea);
+        read(linea,inputPCSrc);
+        data_in_PCSrc <= inputPCSrc;
     end if;
     wait for PERIOD;
 end loop;
@@ -148,10 +150,10 @@ end process data_U;
 ------------------------------------------------------------------------------------
 tb_stimulus_PC : PROCESS
 begin
-wait for (OFFSET + 0.5*PERIOD);
+wait for (PERIOD);
     read_data_inPC   <= '1';		
     for i in min_value to max_value loop --para leitura do n° de valores de entrada
-        wait for PERIOD;
+        wait for DUTY_CYCLE*PERIOD;
     end loop;
     read_data_inPC <= '0';		
 wait; --suspend process

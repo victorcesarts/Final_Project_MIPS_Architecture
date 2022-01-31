@@ -10,5 +10,5 @@ add wave sim:/tb_Adder/*
 view wave
 view structure
 view signals
-run 68000 ns
+run 63000 ns
 #quit -force

@@ -16,6 +16,11 @@ end InstrMemory;
 --sub $s4, $s3, $t2
 --and $s5, $s3, $s6
 --or $s7, $s5, $s4
+--lw $t2, 40($0)	#lw $s2 0x10010000($0)
+--add $s1, $s3, $s5
+--sw $s1, 40($0)	#lw $s2 0x10010000($0)
+--lw $t0, 40($0)
+--syscall
 
 architecture InstrARCH of InstrMemory is 
 signal rom_addr : std_logic_vector(3 downto 0);
@@ -23,12 +28,6 @@ type rom is array (0 to N - 1) of std_logic_vector(31 downto 0);
 
 constant Instr_data : 
 rom :=rom'(
-    --"00100000000010100000000000000000",
-    --"00100000000100110000000000000000",
-    --"00100000000101000000000000000000",
-    --"00100000000101010000000000000000",
-    --"00100000000101110000000000000000",
-    --"00100000000101100000000000000000",
     "00100000000101100000000001100100",
     "10101100000101100000000000101000",
     "10001100000010100000000000101000",
@@ -36,13 +35,13 @@ rom :=rom'(
     "00000010011010101010000000100010",
     "00000010011101101010100000100100",
     "00000010101101001011100000100101",
-    "10001100000010100000000000101000"
+    "00000010011101011000100000100000",
+    "10101100000100010000000000101000",
+    "10001100000010000000000000101000",
+    "00000000000000000000000000001100"
     );
 begin
     rom_addr <= address(5 downto 2);
     instr <= Instr_data(to_integer(unsigned(rom_addr))) when 
-            ((address >= x"00400000") and (address <= x"0040001C")) else 
-           -- Instr_data(1) when (to_integer(unsigned(rom_addr))) >= (N-1) else
-            x"0000000C";    --syscall. The range can be change if there are more instr.
-                                                                                                                                          
+            ((address >= x"00400000") and (address < x"10010000")) else x"0000000C";    --syscall. The range can be change if there are more instr.                                                                                                                               
 end InstrARCH; 

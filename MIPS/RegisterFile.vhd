@@ -19,15 +19,24 @@ end RegisterFile;
 architecture REGFileARCH of RegisterFile is
         type regtype is array (31 downto 0) of std_logic_vector(31 downto 0);
         signal reg : regtype := (others => (others => '0'));
+        signal count : integer := 0;
+		
     begin
         process(clk) begin
             if (rising_edge(clk)) then
-                if (reset = '1') then
-                reg <= (others => (others => '0'));
-            elsif (WE3 = '1') then
-                    reg(to_integer(unsigned(A3))) <= WD3;
-                end if;
-            end if;
+					if (reset = '1') then
+						if (count < 32) then
+							count <= count + 1;
+							reg(count) <= x"00000000";
+						else
+							count <= 0;
+						end if;
+					else
+						if (WE3 = '1') then
+							reg(to_integer(unsigned(A3))) <= WD3;
+						end if;
+					end if;
+				end if;
         end process;
 		  
 	    process (A1, A2, A3, WD3, WE3) begin
@@ -43,6 +52,3 @@ architecture REGFileARCH of RegisterFile is
 		    end if;
 	    end process;
 end REGFileARCH; 
-
-        
-

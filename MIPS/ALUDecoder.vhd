@@ -3,8 +3,6 @@
 --    THE MEMORY IS IN LITTLE ENDIAN            --
 --    Author: Víctor César Teixeira Santos      --
 --    Federal University of Minas Gerais        --
-
-
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;

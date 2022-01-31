@@ -64,7 +64,7 @@ entity MipsProcessor is
     );
     
     InstrMem_inst : InstrMemory 
-    generic map(N => 8)
+    generic map(N => 11)
     port map(
         address => internal_pc,
         instr   => internal_instr

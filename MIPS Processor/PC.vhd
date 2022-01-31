@@ -3,22 +3,39 @@ use ieee.std_logic_1164.all;
 
 entity PC is 
     port(
-			pcin         : in std_logic_vector(31 downto 0);
-			clk, reset   : in std_logic;
-			pcout        : out std_logic_vector(31 downto 0)
+		pcin         : in std_logic_vector(31 downto 0);
+		clk, reset   : in std_logic;
+		pcout        : out std_logic_vector(31 downto 0)
 	);
 end PC;
 
-        architecture PCArch of PC is
-	 begin   
-        process (clk, reset)
+    architecture PCArch of PC is
+	signal temp : std_logic_vector(31 downto 0);
+	begin   
+        process (clk, pcin, reset)
         begin
-            --if ((pcin >= x"00400000") and (pcin <= x"0FFFFFFD")) then
-                --overflowFlag <= '0';
-                if (reset = '1' and rising_edge(clk)) then 
-                    pcout <= x"00400000";           
-                elsif(rising_edge(clk) and reset = '0') then
-                    pcout <= pcin;
+            if (reset = '1') then 
+                temp <= x"BFC00000";                           
+			else
+                if (temp = x"BFC00000" or pcin >= x"BFC00000") then
+                    temp <= x"00400000"; 
+                elsif (pcin = x"0040002C" or pcin = x"90000004") then -- this condition needs to be changed if you have a bigger program
+                    temp <= x"90000000"; 
+                else
+                    temp <= x"00000000";
+                end if;
+		    end if;
+
+            if (rising_edge(clk)) then
+                if (reset = '1') then 
+                    pcout <= temp;       
+			    else 
+                    if (temp = x"00400000" or temp = x"90000000") then
+			            pcout <= temp;
+                    else
+                        pcout <= pcin;
+                    end if;
+                end if;               
             end if;
-			end process;
+		end process;
     end PCArch;

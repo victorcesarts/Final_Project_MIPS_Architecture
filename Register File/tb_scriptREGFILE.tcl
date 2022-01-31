@@ -10,5 +10,5 @@ add wave sim:/tb_REGFile/*
 view wave
 view structure
 view signals
-run 280 ns
+run 410 ns
 #quit -force

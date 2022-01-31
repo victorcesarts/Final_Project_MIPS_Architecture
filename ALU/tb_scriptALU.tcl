@@ -10,5 +10,5 @@ add wave sim:/tb_ALU/*
 view wave
 view structure
 view signals
-run 600 ns
+run 1000 ns
 #quit -force

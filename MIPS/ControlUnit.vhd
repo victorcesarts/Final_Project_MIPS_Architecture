@@ -42,7 +42,6 @@ architecture structControlUnit of ControlUnit is
             ALUControlD : out std_logic_vector(2 downto 0)
         );
     end component;
-
         signal ALUopcode : std_logic_vector(1 downto 0);
         signal internal_Branch : std_logic;
     begin

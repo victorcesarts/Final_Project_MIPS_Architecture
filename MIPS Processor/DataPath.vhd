@@ -129,7 +129,7 @@ architecture ARCH of DataPath is
     signal PCplus4         : std_logic_vector(31 downto 0);
     signal internal_PCout  : std_logic_vector(31 downto 0);
     signal PC_branch       : std_logic_vector(31 downto 0);
-    signal PC_in           : std_logic_vector(31 downto 0);
+    signal PC_in           : std_logic_vector(31 downto 0) := x"BFC00000";
     signal internal_AdderB : std_logic_vector(31 downto 0);
 
     begin

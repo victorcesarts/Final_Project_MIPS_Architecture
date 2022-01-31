@@ -31,7 +31,7 @@ end component;
     file	outputs_data_comp : text open write_mode is "outputdata_comp.txt";
 
     constant min_value  : natural := 1;
-    constant max_value  : natural := 7;
+    constant max_value  : natural := 54;
 
     signal read_data_inALU : std_logic:='0';
     signal flag_write	  : std_logic:='0';

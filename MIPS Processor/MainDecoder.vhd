@@ -3,8 +3,6 @@
 --    THE MEMORY IS IN LITTLE ENDIAN            --
 --    Author: Víctor César Teixeira Santos      --
 --    Federal University of Minas Gerais        --
-
-
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
@@ -37,6 +35,36 @@ architecture MainDECARCH of maindecoder is
             MemToRegM <= '0';    
             ALUopM <= "10"; --look at funct   
             jumpM <= '0';
+        
+        when 32 to 37 => --all load instructions
+            RegWriteM <= '1';
+            RegDstM <= "00";
+            AluSrcM <= '1';
+            BranchM <= '0'; 
+            MemWriteM <= '0'; 
+            MemToRegM <= '1';    
+            ALUopM <= "00"; --ADD 
+            jumpM <= '0';
+
+        when 40 to 43 => --all store instructions
+            RegWriteM <= '0';
+            RegDstM <= "XX";
+            AluSrcM <= '1';
+            BranchM <= '0'; 
+            MemWriteM <= '1'; 
+            MemToRegM <= 'X';    
+            ALUopM <= "00"; --ADD 
+            jumpM <= '0';
+            
+        when 8 => --addi 
+            RegWriteM <= '1';
+            RegDstM <= "00";
+            AluSrcM <= '1';
+            BranchM <= '0'; 
+            MemWriteM <= '0'; 
+            MemToRegM <= '0';    
+            ALUopM <= "00"; --ADD 
+            jumpM <= '0';
 
         when 3 => --Jump and link
             RegWriteM <= '1';
@@ -48,55 +76,25 @@ architecture MainDECARCH of maindecoder is
             ALUopM <= "10"; --look at funct   
             jumpM <= '0';
 
-            when 32 to 37 => --all load instructions
-                RegWriteM <= '1';
-                RegDstM <= "00";
-                AluSrcM <= '1';
-                BranchM <= '0'; 
-                MemWriteM <= '0'; 
-                MemToRegM <= '1';    
-                ALUopM <= "00"; --ADD 
-                jumpM <= '0';
+        when 2 => --JUMP
+            RegWriteM <= '0';
+            RegDstM <= "XX";
+            AluSrcM <= 'X';
+            BranchM <= 'X'; 
+            MemWriteM <= '0'; 
+            MemToRegM <= 'X';    
+            ALUopM <= "XX";  
+            jumpM <= '1';
 
-            when 40 to 43 => --all store instructions
-                RegWriteM <= '0';
-                RegDstM <= "XX";
-                AluSrcM <= '1';
-                BranchM <= '0'; 
-                MemWriteM <= '1'; 
-                MemToRegM <= 'X';    
-                ALUopM <= "00"; --ADD 
-                jumpM <= '0';
-            
-            when 8 | 9 => --addi or addiu
-                RegWriteM <= '1';
-                RegDstM <= "00";
-                AluSrcM <= '1';
-                BranchM <= '0'; 
-                MemWriteM <= '0'; 
-                MemToRegM <= '0';    
-                ALUopM <= "00"; --ADD 
-                jumpM <= '0';
-
-            when 2 => --JUMP
-                RegWriteM <= '0';
-                RegDstM <= "XX";
-                AluSrcM <= 'X';
-                BranchM <= 'X'; 
-                MemWriteM <= '0'; 
-                MemToRegM <= 'X';    
-                ALUopM <= "XX";  
-                jumpM <= '1';
-
-            when others => 
-                MemToRegM <= 'X';
-                MemWriteM <= 'X';
-                BranchM <= 'X';
-                AluSrcM <= 'X';
-                RegDstM <= "XX";
-                RegWriteM <= 'X';
-                jumpM <= 'X';
-                ALUopM <= "XX";
+        when others => 
+            MemToRegM <= 'X';
+            MemWriteM <= 'X';
+            BranchM <= 'X';
+            AluSrcM <= 'X';
+            RegDstM <= "XX";
+            RegWriteM <= 'X';
+            jumpM <= 'X';
+            ALUopM <= "XX";
         end case;
     end process;
 end MainDECARCH;

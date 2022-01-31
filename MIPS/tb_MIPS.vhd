@@ -22,7 +22,7 @@ component MIPS is
 end component;
 
     -- Clock period definitions
-    constant PERIOD     : time := 15 ns;
+    constant PERIOD     : time := 20 ns;
     constant DUTY_CYCLE : real := 0.5;
     constant OFFSET     : time := 5 ns;
 
@@ -32,20 +32,20 @@ end component;
     file	outputs_data_comp : text open write_mode is "outputdata_comp.txt";
 
     constant min_value	: natural := 1;
-    constant max_value  : natural := 13;
+    constant max_value  : natural := 22;
 
     signal read_data_in	 : std_logic:='0';
-    signal flag_write	     : std_logic:='0';
+    signal flag_write	 : std_logic:='0';
 
     signal data_CLK     : std_logic := '0';
-    signal data_reset   : std_logic;
+    signal data_reset   : std_logic := '0';
     signal ReadDatain   : std_logic_vector(31 downto 0);
     signal data_Instr   : std_logic_vector(31 downto 0);
     signal pc_out       : std_logic_vector(31 downto 0);
     signal ALU_out      : std_logic_vector(31 downto 0);
     signal Write_out    : std_logic_vector(31 downto 0);
     signal MemWrite_out : std_logic;
-    
+    signal Tempo : std_logic := '0';
 begin
     DUT : MIPS 
     port map(
@@ -58,7 +58,15 @@ begin
         WriteData   => Write_out,
         MemWrite    => MemWrite_out
     );
-    data_CLK <= not data_CLK after PERIOD/5;
+    Tempo <= '1' afteR 20 ns;
+    clk : process
+    begin
+        if Tempo = '1' then
+            data_CLK <= not data_CLK;
+        end if;
+        wait for DUTY_CYCLE*PERIOD;
+    end process;
+    data_reset <= '0', '1' after 18 ns, '0' after 23 ns;
     
 
 ------------------------------------------------------------------------------------
@@ -68,17 +76,12 @@ data :process
 variable linea         : line;
 variable inputReadData : std_logic_vector(31 downto 0);
 variable inputInstr    : std_logic_vector(31 downto 0);
-variable inputReset    : std_logic;
 begin
 while not endfile(inputs_data) loop
     if read_data_in = '1' then
         readline(inputs_data,linea);
         read(linea,inputInstr);
         data_Instr <= inputInstr;
-
-        readline(inputs_data,linea);
-        read(linea,inputReset);
-        data_reset <= inputReset;
 
         readline(inputs_data,linea);
         hread(linea,inputReadData);
@@ -94,10 +97,10 @@ end process data;
 ------------------------------------------------------------------------------------
 tb_stimulus : PROCESS
 begin
-wait for (OFFSET);
+wait for (PERIOD+OFFSET);
     read_data_in <= '1';		
     for i in min_value to max_value loop --para leitura do n° de valores de entrada
-        wait for PERIOD;
+        wait for DUTY_CYCLE*PERIOD;
     end loop;
     read_data_in <= '0';		
 wait; --suspend process
@@ -108,10 +111,10 @@ end process tb_stimulus;
 ------------------------------------------------------------------------------------   
 tb_outputs : PROCESS
 begin
-wait for PERIOD;
+wait for PERIOD+OFFSET;
     flag_write <= '1';
     for i in min_value to max_value loop 
-        wait for PERIOD;
+        wait for DUTY_CYCLE*PERIOD;
     end loop;
     flag_write <= '0';			
 wait; 

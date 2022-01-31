@@ -133,6 +133,7 @@ variable linea            : line;
 variable lineSTR          : line;
 variable comp_out         : std_logic;
 variable comp_outALU      : std_logic_vector(2 downto 0);
+variable comp_outReg      : std_logic_vector(1 downto 0);
 variable RegWriteoutput   : std_logic;
 variable RegDstoutput     : std_logic_vector(1 downto 0);
 variable AluSrcoutput     : std_logic;
@@ -169,17 +170,17 @@ begin
             write(linea,RegDstoutput);
             writeline(outputs_data, linea);
             --To read in order to compare--
-           -- readline(data_compare, linea);
-			--read(linea, comp_out);
-            --assert comp_out = RegDstoutput  report "ERROR" severity warning;
+            readline(data_compare, linea);
+			read(linea, comp_outReg);
+            assert comp_outReg = RegDstoutput  report "ERROR" severity warning;
             --Writing if the output it's good or not--
-            --if (comp_out /= RegDstoutput) then
-               -- write(lineSTR, string'("Error"));
-               -- writeline(outputs_data_comp, lineSTR);
-            --else
-              --  write(lineSTR, string'("Good"));
-              --  writeline(outputs_data_comp, lineSTR);
-           -- end if;
+            if (comp_outReg /= RegDstoutput) then
+             write(lineSTR, string'("Error"));
+             writeline(outputs_data_comp, lineSTR);
+            else
+              write(lineSTR, string'("Good"));
+              writeline(outputs_data_comp, lineSTR);
+            end if;
 
             AluSrcoutput    := AluSrcOut;
             write(lineSTR, string'("AluSrc"));

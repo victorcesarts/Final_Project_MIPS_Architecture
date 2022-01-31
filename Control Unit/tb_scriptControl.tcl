@@ -12,5 +12,5 @@ add wave sim:/tb_ControlUnit/*
 view wave
 view structure
 view signals
-run 300ns
+run 800ns
 #quit -force

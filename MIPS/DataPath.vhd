@@ -24,12 +24,6 @@ architecture ARCH of DataPath is
 -------------------------------------------------------------
 --                   COMPONENTS BEGIN                     --
 -------------------------------------------------------------
-    --component InstrMemory is port(
-      --  address : in std_logic_vector(31 downto 0);
-        --instr   : out std_logic_vector(31 downto 0)
-    --);
-    --end component;
-
     component RegisterFile is
         port(
             A1 : in std_logic_vector(4 downto 0);
@@ -167,14 +161,6 @@ architecture ARCH of DataPath is
             InSll  => SignImm,
             OutSll => internal_AdderB
         );
--------------------------------------------------------------
---                   Instruction Logic                     --
--------------------------------------------------------------
-     --   Instr_inst : InstrMemory  port map(
-      --      address => internal_PCout,
-        --    instr   => internal_Instr
-        --);
-
 -------------------------------------------------------------
 --                   Register File Logic                   --
 -------------------------------------------------------------
