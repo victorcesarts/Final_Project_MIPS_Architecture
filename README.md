@@ -1,6 +1,7 @@
 ﻿# Projeto Final LAB. SD
  The microarchitecture in details
-![image](https://user-images.githubusercontent.com/83244223/148828030-92c6e24b-d68b-432a-a4f6-1262e685dc21.png)
+![image](https://user-images.githubusercontent.com/83244223/151991801-c03c46ea-3d90-49d9-8e38-b610573b4ee1.png)
+
 MIPS DETAILS
 ![image](https://user-images.githubusercontent.com/83244223/148827719-a2d8e91f-30b1-40c0-b7bc-ae4b453cc261.png)
 
