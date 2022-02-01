@@ -26,5 +26,5 @@ add wave sim:/tb_MIPSProcessor/*
 view wave
 view structure
 view signals
-run 1050 ns
+run 250 ns
 #quit -force

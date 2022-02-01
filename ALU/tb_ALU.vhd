@@ -8,7 +8,6 @@ entity tb_ALU is
 end tb_ALU;
 
 architecture test of tb_ALU is
-
 component ALU is 
 port (
     ALUControl 	: in    std_logic_vector(2 downto 0);
@@ -17,11 +16,9 @@ port (
     ZEROFlag  	: out   std_logic;
     ALUResult	: out   std_logic_vector(31 downto 0)
 );
-
 end component;
-
     -- Clock period definitions
-    constant PERIOD     : time := 15 ns;
+    constant PERIOD     : time := 20 ns;
     constant DUTY_CYCLE : real := 0.5;
     constant OFFSET     : time := 5 ns;
 
@@ -34,7 +31,7 @@ end component;
     constant max_value  : natural := 54;
 
     signal read_data_inALU : std_logic:='0';
-    signal flag_write	  : std_logic:='0';
+    signal flag_write	   : std_logic:='0';
 
     signal data_ALUControl  : std_logic_vector(2 downto 0);
     signal data_in_SrcA     : std_logic_vector(31 downto 0);
@@ -131,21 +128,21 @@ begin
             write(linea,ALUresultoutput);
            writeline(outputs_data, linea);
             --To read in order to compare--
-            --readline(data_compare, lineb);
-			--read(lineb, comp_outALU);
-            --assert comp_outALU = ALUresultoutput  report "ERROR" severity warning;
+            readline(data_compare, lineb);
+		    read(lineb, comp_outALU);
+            assert comp_outALU = ALUresultoutput  report "ERROR" severity warning;
             --Writing if the output it's good or not--
-           -- if (comp_outALU = ALUresultoutput) then
-            --    write(lineSTR, string'("ALU Result"));
-            --    writeline(outputs_data_comp, lineSTR);
-            --    write(lineSTR, string'("GOOD"));
-             --   writeline(outputs_data_comp, lineSTR);
-           --else
-            --    write(lineSTR, string'("ALU Result"));
-            --    writeline(outputs_data_comp, lineSTR);
-            --    write(lineSTR, string'("ERROR"));
-            --    writeline(outputs_data_comp, lineSTR);
-           -- end if;
+           if (comp_outALU = ALUresultoutput) then
+               write(lineSTR, string'("ALU Result"));
+                writeline(outputs_data_comp, lineSTR);
+               write(lineSTR, string'("GOOD"));
+               writeline(outputs_data_comp, lineSTR);
+           else
+                write(lineSTR, string'("ALU Result"));
+                writeline(outputs_data_comp, lineSTR);
+                write(lineSTR, string'("ERROR"));
+                writeline(outputs_data_comp, lineSTR);
+            end if;
 
             ZEROFlagoutput := ZEROFlagout;
             write(lineSTR, string'("ZEROFlag"));
@@ -153,25 +150,25 @@ begin
             write(linea,ZEROFlagoutput);
             writeline(outputs_data, linea);
             --To read in order to compare--
-           -- readline(data_compare, lineb);
-			--read(lineb, comp_outZERO);
-           -- assert comp_outZERO = ZEROFlagoutput  report "ERROR" severity warning;
+            readline(data_compare, lineb);
+			read(lineb, comp_outZERO);
+            assert comp_outZERO = ZEROFlagoutput  report "ERROR" severity warning;
             --Writing if the output it's good or not--
-           -- if (comp_outZERO /= ZEROFlagoutput) then
-            --    write(lineSTR, string'("Zero Flag"));
-            --    writeline(outputs_data_comp, lineSTR);
-            --    write(lineSTR, string'("Error"));
-            --    writeline(outputs_data_comp, lineSTR);
-            --   write(lineSTR, string'("-------------------------"));
-            --   writeline(outputs_data_comp, lineSTR);
-          --  else
-            --    write(lineSTR, string'("Zero Flag"));
-            --    writeline(outputs_data_comp, lineSTR);
-             --   write(lineSTR, string'("Good"));
-             --   writeline(outputs_data_comp, lineSTR);
-             --   write(lineSTR, string'("-------------------------"));
-              --  writeline(outputs_data_comp, lineSTR);
-           -- end if;
+            if (comp_outZERO /= ZEROFlagoutput) then
+                write(lineSTR, string'("Zero Flag"));
+                writeline(outputs_data_comp, lineSTR);
+                write(lineSTR, string'("Error"));
+                writeline(outputs_data_comp, lineSTR);
+               write(lineSTR, string'("-------------------------"));
+               writeline(outputs_data_comp, lineSTR);
+            else
+                write(lineSTR, string'("Zero Flag"));
+                writeline(outputs_data_comp, lineSTR);
+                write(lineSTR, string'("Good"));
+                writeline(outputs_data_comp, lineSTR);
+                write(lineSTR, string'("-------------------------"));
+                writeline(outputs_data_comp, lineSTR);
+            end if;
             write(lineSTR, string'("-------------------------"));
             writeline(outputs_data, lineSTR);
         end if;
